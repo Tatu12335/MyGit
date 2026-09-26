@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MyGit.CLI/MyGit.CLI.csproj" />
+  <Project Path="MyGit/MyGit.Core.csproj" />
+</Solution>
