@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyGit.CLI
+namespace MyGit.CLI.Commands
 {
     internal class HashObjectCommand : AsyncCommand<HashObjectCommand.Settings>
     {
@@ -28,19 +28,23 @@ namespace MyGit.CLI
         {
             if (!File.Exists(settings.FilePath))
             {
-                AnsiConsole.MarkupLine($"[red]error:[/] tiedostoa {Markup.Escape(settings.FilePath)} ei löydy");
+                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(settings.FilePath)} not found");
                 return 1;
             }
 
             var hash = await this._fileHandlingOrchestration.AssembleFileData(settings.FilePath);
             string hashHex = Convert.ToHexString(hash).ToLowerInvariant();
-            if(settings.Write)
+            string folder = hashHex.Substring(0, 2);
+            string fileName = hashHex.Substring(2);
+
+            if (settings.Write)
             {
+                
                 var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".mygit");
-                var objectPath = Path.Combine(gitDir, "objects", hashHex);
+                var objectPath = Path.Combine("objects",gitDir, folder, fileName);
                 if (!File.Exists(objectPath))
                 {
-                    await File.WriteAllBytesAsync(objectPath, hash);
+                    await File.WriteAllBytesAsync(objectPath, hash, CancellationToken.None);
                     AnsiConsole.MarkupLine($"[green]Wrote object to {Markup.Escape(objectPath)}[/]");
                 }
                 else

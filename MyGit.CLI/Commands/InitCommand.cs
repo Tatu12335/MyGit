@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyGit.CLI
+namespace MyGit.CLI.Commands
 {
     public class InitCommand : Command<InitCommand.Settings>
     {

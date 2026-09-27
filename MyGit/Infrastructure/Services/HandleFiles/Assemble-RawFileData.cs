@@ -3,8 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Security.Cryptography;
     using System.Text;
     using MyGit.Core.Application.Interfaces.HandleFiles;
+    using Spectre.Console;
 
     public class Assemble_RawFileData : IHandleFiles
     {
@@ -19,7 +21,6 @@
 
         public async Task<byte[]> AssembleBlob(byte[] fileContentSize, byte[] fileContent)
         {
-            
             byte[] header = Encoding.UTF8.GetBytes($"blob {fileContentSize.Length}\0");
 
             using var memoryStream = new MemoryStream();
@@ -27,19 +28,20 @@
             await memoryStream.WriteAsync(header, 0, header.Length);
             await memoryStream.WriteAsync(fileContent, 0, fileContent.Length);
 
-            byte[] fullData = memoryStream.ToArray();
+            byte[] fullData;
+
+            using (var sha1 = SHA1.Create())
+            {
+                memoryStream.Position = 0;
+                byte[] hash = sha1.ComputeHash(memoryStream);
+
+                fullData = hash.ToArray();
+
+                Debug.WriteLine($"SHA-1 Hash: {BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant()}");
+            }
+
             return fullData;
         }
-
-        public async Task<byte[]> HashBlob(FileStream stream)
-        {
-            using (var sha1 = System.Security.Cryptography.SHA1.Create())
-            {
-                return await sha1.ComputeHashAsync(stream);
-            }
-        }
-
-
 
         public async Task<byte[]> GetFileContentSize(string filePath)
         {
