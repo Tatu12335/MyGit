@@ -47,6 +47,13 @@
             return fullData;
         }
 
+        public async Task CompressBlob(byte[] blobData, string outputFilePath)
+        {
+            using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
+            using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
+            await compressionStream.WriteAsync(blobData, 0, blobData.Length);
+        }
+
         public async Task<byte[]> GetFileContentSize(string filePath)
         {
             var fileInfo = new FileInfo(filePath);
