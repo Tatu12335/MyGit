@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MyGit.CLI;
+using MyGit.CLI.Commands;
 using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Application.Services;
 using MyGit.Core.Infrastructure.Services.HandleFiles;
 using MyGit.Core.Middleware;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 class Program
@@ -32,6 +33,17 @@ class Program
 
             config.AddCommand<HashObjectCommand>("hash-object")
                 .WithDescription("Calculates the hash of a file and stores it if needed");
+
+            config.SetExceptionHandler((ex, context) =>
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] {Markup.Escape(ex.Message)}");
+
+                #if DEBUG
+                    AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+                #endif
+                return 1;
+
+            });
         });
         return await ui.RunAsync(args);
     }

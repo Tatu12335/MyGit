@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyGit.CLI
+namespace MyGit.CLI.Commands
 {
     public class InitCommand : Command<InitCommand.Settings>
     {
@@ -18,7 +18,6 @@ namespace MyGit.CLI
         {
             var path = settings.path ?? Directory.GetCurrentDirectory();
             var gitDir = Path.Combine(path, ".mygit");
-
             if (Directory.Exists(gitDir))
             {
                 // Used markup to escape the gitDir path to prevent any special characters from being interpreted as markup.
