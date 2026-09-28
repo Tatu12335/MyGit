@@ -41,7 +41,7 @@ namespace MyGit.CLI.Commands
             {
                 
                 var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".mygit");
-                var objectPath = Path.Combine("objects",gitDir, folder, fileName);
+                var objectPath = Path.Combine(gitDir, "objects", folder, fileName);
                 if (!File.Exists(objectPath))
                 {
                     await File.WriteAllBytesAsync(objectPath, hash, CancellationToken.None);
