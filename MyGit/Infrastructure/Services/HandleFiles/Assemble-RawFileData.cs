@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO.Compression;
+    using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
     using MyGit.Core.Application.Interfaces.HandleFiles;
@@ -18,7 +20,9 @@
         {
             return await File.ReadAllBytesAsync(filePath);
         }
-
+        // for now the blob seems to not be correctly assembled,
+        // the hash is not matching the one from git,
+        // but the file content is correct(im pretty sure)
         public async Task<byte[]> AssembleBlob(byte[] fileContentSize, byte[] fileContent)
         {
             byte[] header = Encoding.UTF8.GetBytes($"blob {fileContentSize.Length}\0");

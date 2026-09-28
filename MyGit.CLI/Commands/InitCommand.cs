@@ -18,7 +18,6 @@ namespace MyGit.CLI.Commands
         {
             var path = settings.path ?? Directory.GetCurrentDirectory();
             var gitDir = Path.Combine(path, ".mygit");
-
             if (Directory.Exists(gitDir))
             {
                 // Used markup to escape the gitDir path to prevent any special characters from being interpreted as markup.
