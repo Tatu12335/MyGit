@@ -20,31 +20,29 @@
         {
             return await File.ReadAllBytesAsync(filePath);
         }
+
         // for now the blob seems to not be correctly assembled,
         // the hash is not matching the one from git,
         // but the file content is correct(im pretty sure)
-        public async Task<byte[]> AssembleBlob(byte[] fileContentSize, byte[] fileContent)
+        public byte[] AssembleBlob( byte[] fileContent)
         {
-            byte[] header = Encoding.UTF8.GetBytes($"blob {fileContentSize.Length}\0");
+            byte[] header = Encoding.UTF8.GetBytes($"blob {fileContent.Length}\0");
 
             using var memoryStream = new MemoryStream();
 
-            await memoryStream.WriteAsync(header, 0, header.Length);
-            await memoryStream.WriteAsync(fileContent, 0, fileContent.Length);
+            memoryStream.Write(header, 0, header.Length);
+            memoryStream.Write(fileContent, 0, fileContent.Length);
 
-            byte[] fullData;
+            var data = memoryStream.ToArray();
 
-            using (var sha1 = SHA1.Create())
-            {
-                memoryStream.Position = 0;
-                byte[] hash = sha1.ComputeHash(memoryStream);
+            return data;
+        }
 
-                fullData = hash.ToArray();
-
-                Debug.WriteLine($"SHA-1 Hash: {BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant()}");
-            }
-
-            return fullData;
+        public byte[] CalculateHash(byte[] data)
+        {
+            using var sha1 = SHA1.Create();
+            byte[] hash = sha1.ComputeHash(data);
+            return hash.ToArray();
         }
 
         public async Task CompressBlob(byte[] blobData, string outputFilePath)
@@ -52,14 +50,6 @@
             using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
             using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
             await compressionStream.WriteAsync(blobData, 0, blobData.Length);
-        }
-
-        public async Task<byte[]> GetFileContentSize(string filePath)
-        {
-            var fileInfo = new FileInfo(filePath);
-            long fileSizeInBytes = fileInfo.Length;
-            Debug.WriteLine($"File size in bytes: {fileSizeInBytes}");
-            return BitConverter.GetBytes(fileSizeInBytes);
         }
     }
 }

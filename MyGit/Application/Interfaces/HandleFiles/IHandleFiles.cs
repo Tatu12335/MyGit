@@ -7,7 +7,9 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
     public interface IHandleFiles
     {
         public Task<byte[]> ReadFile(string filePath);
-        public Task<byte[]> AssembleBlob(byte[] fileContentSize, byte[] fileContent);
-        public Task<byte[]> GetFileContentSize(string filePath);
+
+        public byte[] AssembleBlob(byte[] fileContent);
+
+        public byte[] CalculateHash(byte[] data);
     }
 }
