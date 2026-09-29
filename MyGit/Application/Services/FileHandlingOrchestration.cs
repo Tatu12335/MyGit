@@ -17,8 +17,9 @@ namespace MyGit.Core.Application.Services
         public async Task<byte[]> AssembleFileData(string filePath)
         {
             byte[] content = await this._handleFiles.ReadFile(filePath);
-            byte[] fileContentSize = await this._handleFiles.GetFileContentSize(filePath);
-            return await this._handleFiles.AssembleBlob(fileContentSize, content);
+            byte[] blob = this._handleFiles.AssembleBlob(content);
+            byte[] hash = this._handleFiles.CalculateHash(blob);
+            return hash;
         }
     }
 }

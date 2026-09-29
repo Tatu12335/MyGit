@@ -39,7 +39,6 @@ namespace MyGit.CLI.Commands
 
             if (settings.Write)
             {
-                
                 var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".mygit");
                 var objectPath = Path.Combine(gitDir, "objects", folder, fileName);
                 if (!File.Exists(objectPath))
