@@ -20,6 +20,7 @@ class Program
         services.AddLogging(configure => configure.AddConsole());
         services.AddTransient<InitCommand>();
         services.AddTransient<HashObjectCommand>();
+        services.AddTransient<TreeCommand>();
 
         var register = new TypeRegistrar(services);
 
@@ -33,6 +34,9 @@ class Program
 
             config.AddCommand<HashObjectCommand>("hash-object")
                 .WithDescription("Calculates the hash of a file and stores it if needed");
+
+            config.AddCommand<TreeCommand>("tree")
+                .WithDescription("Displays the contents of a directory and its subdirectories");
 
             config.SetExceptionHandler((ex, context) =>
             {
