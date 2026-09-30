@@ -41,5 +41,19 @@ namespace MyGit.Core.Application.Services
 
             return hash;
         }
+
+        public string DisplayTree(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(path)} not found");
+                return null;
+            }
+
+            string tree = this._handleFiles.ListFilesAndDirectories(path);
+            AnsiConsole.MarkupLine($"[green]Directory tree for {Markup.Escape(path)}:[/]");
+            AnsiConsole.MarkupLine(tree);
+            return tree;
+        }
     }
 }
