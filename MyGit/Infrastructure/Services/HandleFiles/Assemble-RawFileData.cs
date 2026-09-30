@@ -21,6 +21,9 @@
             return await File.ReadAllBytesAsync(filePath);
         }
 
+        // for now the blob seems to not be correctly assembled,
+        // the hash is not matching the one from git,
+        // but the file content is correct(im pretty sure)
         public byte[] AssembleBlob( byte[] fileContent)
         {
             byte[] header = Encoding.UTF8.GetBytes($"blob {fileContent.Length}\0");
@@ -33,36 +36,6 @@
             var data = memoryStream.ToArray();
 
             return data;
-        }
-
-        public string ListFilesAndDirectories(string directoryPath)
-        {
-            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
-            {
-                AnsiConsole.MarkupLine($"[yellow]warning:[/]  Skipping directory {Markup.Escape(directoryPath)}");
-                directoryPath = string.Empty;
-                return directoryPath;
-            }
-
-            if (directoryPath == string.Empty)
-            {
-                AnsiConsole.MarkupLine($"[red]error:[/]  Directory path is null or empty");
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var dir in Directory.GetDirectories(directoryPath))
-            {
-                sb.AppendLine($"dir: {dir}");
-                sb.AppendLine(ListFilesAndDirectories(dir));
-            }
-
-            foreach (var file in Directory.GetFiles(directoryPath))
-            {
-                sb.AppendLine($"file: {file}");
-            }
-
-            return sb.ToString();
         }
 
         public byte[] CalculateHash(byte[] data)
