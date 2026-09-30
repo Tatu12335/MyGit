@@ -13,5 +13,7 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
         public byte[] CalculateHash(byte[] data);
 
         public Task CompressBlob(byte[] blobData, string outputFilePath);
+
+        public string ListFilesAndDirectories(string directoryPath);
     }
 }
