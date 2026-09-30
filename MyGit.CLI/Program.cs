@@ -24,7 +24,7 @@ class Program
         var register = new TypeRegistrar(services);
 
         var ui = new CommandApp(register);
-
+        // Commands
         ui.Configure(config =>
         {
             config.SetApplicationName("MyGit");
