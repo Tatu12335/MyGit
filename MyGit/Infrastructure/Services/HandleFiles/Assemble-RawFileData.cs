@@ -7,6 +7,7 @@
     using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
+    using Microsoft.VisualBasic;
     using MyGit.Core.Application.Interfaces.HandleFiles;
     using Spectre.Console;
 
@@ -21,7 +22,20 @@
             return await File.ReadAllBytesAsync(filePath);
         }
 
-        public byte[] AssembleBlob( byte[] fileContent)
+        public byte[] AssembleTree(byte[] tree)
+        {
+            byte[] header = Encoding.UTF8.GetBytes($"tree {tree.Length}\0");
+
+            using var memoryStream = new MemoryStream();
+
+            memoryStream.Write(header, 0, header.Length);
+            memoryStream.Write(tree, 0, tree.Length);
+
+            var data = memoryStream.ToArray();
+            return data;
+        }
+
+        public byte[] AssembleBlob(byte[] fileContent)
         {
             byte[] header = Encoding.UTF8.GetBytes($"blob {fileContent.Length}\0");
 
