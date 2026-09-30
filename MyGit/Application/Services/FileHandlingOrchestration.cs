@@ -1,4 +1,5 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,8 +17,20 @@ namespace MyGit.Core.Application.Services
 
         public void WriteFileToMemory(byte[] blobData, string outputFilePath)
         {
+            if (string.IsNullOrWhiteSpace(outputFilePath))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] Output file path is null or empty");
+                return;
+            }
+
+            if (File.Exists(outputFilePath))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(outputFilePath)} already exists");
+                return;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
             this._handleFiles.CompressBlob(blobData, outputFilePath);
-            return;
         }
 
         public async Task<byte[]> AssembleFileData(string filePath)
