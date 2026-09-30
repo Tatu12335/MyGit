@@ -15,5 +15,7 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
         public Task CompressBlob(byte[] blobData, string outputFilePath);
 
         public string ListFilesAndDirectories(string directoryPath);
+
+        public byte[] AssembleTree(byte[] tree);
     }
 }

@@ -12,7 +12,7 @@ namespace MyGit.CLI.Commands
         {
             [CommandArgument(0, "<path>")]
             public string path { get; set; } = string.Empty;
-            
+
             [CommandOption("-w|--write")]
             public bool Write { get; set; }
         }
@@ -27,10 +27,9 @@ namespace MyGit.CLI.Commands
         protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken = default)
         {
             this._fileHandlingOrchestration.DisplayTree(settings.path);
-            
             if (settings.Write)
             {
-
+                
             }
 
             return 0;
