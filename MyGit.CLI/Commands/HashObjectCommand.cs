@@ -43,7 +43,7 @@ namespace MyGit.CLI.Commands
                 var objectPath = Path.Combine(gitDir, "objects", folder, fileName);
                 if (!File.Exists(objectPath))
                 {
-                    await File.WriteAllBytesAsync(objectPath, hash, CancellationToken.None);
+                    this._fileHandlingOrchestration.WriteFileToMemory(hash, objectPath);
                     AnsiConsole.MarkupLine($"[green]Wrote object to {Markup.Escape(objectPath)}[/]");
                 }
                 else
