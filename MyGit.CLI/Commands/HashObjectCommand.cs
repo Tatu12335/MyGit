@@ -10,6 +10,7 @@ namespace MyGit.CLI.Commands
     internal class HashObjectCommand : AsyncCommand<HashObjectCommand.Settings>
     {
         private readonly FileHandlingOrchestration _fileHandlingOrchestration;
+
         public HashObjectCommand(FileHandlingOrchestration fileHandlingOrchestration)
         {
             this._fileHandlingOrchestration = fileHandlingOrchestration;

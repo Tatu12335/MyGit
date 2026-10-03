@@ -1,8 +1,10 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
+using MyGit.Core.Domain;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Channels;
 
 namespace MyGit.Core.Application.Services
 {
@@ -42,18 +44,81 @@ namespace MyGit.Core.Application.Services
             return hash;
         }
 
-        public string DisplayTree(string path)
+        public void BuildTreeString(string directoryPath)
         {
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(directoryPath))
             {
-                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(path)} not found");
-                return null;
+                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
+                return;
             }
 
-            string tree = this._handleFiles.ListFilesAndDirectories(path);
-            AnsiConsole.MarkupLine($"[green]Directory tree for {Markup.Escape(path)}:[/]");
-            AnsiConsole.MarkupLine(tree);
-            return tree;
+            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
+            {
+                return;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var dir in Directory.GetDirectories(directoryPath))
+            {
+                sb.AppendLine($"dir: {dir}");
+                this.BuildTreeString(dir);
+            }
+
+            foreach (var file in Directory.GetFiles(directoryPath))
+            {
+                sb.AppendLine($"file: {file}");
+            }
+
+            AnsiConsole.MarkupLine(sb.ToString());
+        }
+
+        public byte[] AssembleTree(string directoryPath)
+        {
+            var treeObjects = new List<TreeObj>();
+            if (!Directory.Exists(directoryPath))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
+                return new byte[0];
+            }
+
+            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
+            {
+                AnsiConsole.MarkupLine($"[yellow]warning:[/]  Skipping directory {Markup.Escape(directoryPath)}");
+                return new byte[0];
+            }
+
+            foreach (var dir in Directory.GetDirectories(directoryPath))
+            {
+               // AnsiConsole.MarkupLine($"[blue]info:[/]  Processing directory {Markup.Escape(dir)}");
+                this.AssembleTree(dir);
+            }
+
+            foreach (var file in Directory.GetFiles(directoryPath))
+            {
+                TreeObj treeObj = new TreeObj();
+
+                treeObj.filename = Path.GetFileName(file);
+
+                //AnsiConsole.MarkupLine($"[blue]info:[/]  Processing file {Markup.Escape(file)}");
+
+                treeObj.hash =  this.AssembleFileData(file).GetAwaiter().GetResult();
+                treeObj.mode = "100644";
+
+                treeObjects.Add(treeObj);
+
+            }
+
+            var fileEntries = new List<byte[]>();
+            foreach (var treeObjs in treeObjects)
+            {
+
+                var fileEntry = this._handleFiles.AssembleFileEntry(treeObjs);
+                fileEntries.Add(fileEntry);
+                AnsiConsole.MarkupLine($"[green]success:[/]  Assembled file entry for {Markup.Escape(treeObjs.filename)}");
+
+            }
+
+            return new byte[0]; // Placeholder return value
         }
     }
 }
