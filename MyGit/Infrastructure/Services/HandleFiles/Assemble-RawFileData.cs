@@ -25,39 +25,53 @@
             return await File.ReadAllBytesAsync(filePath);
         }
 
-        public string[] SortEntriesFilesAlphabetically(string[] filenames)
+        // this seems to be the problem as of now, fix it later!
+        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
         {
-            Array.Sort(filenames, StringComparer.Ordinal);
-            return filenames;
+            var sortedTreeObjs = treeObjs.OrderBy(obj => obj.name, StringComparer.Ordinal).ToList();
+            return sortedTreeObjs;
         }
 
-        public byte[] AssembleFileEntry(TreeObj treeObj)
+        public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
         {
-            var header  = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.filename}\0");
+            var memoryStream = new MemoryStream();
+            foreach (var treeObj in treeObjs)
+            {
+                var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
 
+                memoryStream.Write(header, 0, header.Length);
+                memoryStream.Write(treeObj.hash, 0, treeObj.hash.Length);
+            }
+
+            return memoryStream;
+
+        }
+
+        public string ConvertToASCII(byte[] data)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var b in data)
+            {
+                if (b >= 32 && b <= 127)
+                {
+                    sb.Append(Convert.ToChar(b));
+                }
+
+                sb.Append(b.ToString("X2")); // Convert to hexadecimal string representation
+            }
+
+            return sb.ToString();
+        }
+
+        public byte[] AssembleTree(MemoryStream body)
+        {
             using var memoryStream = new MemoryStream();
-
-            memoryStream.Write(header, 0, header.Length);
-            memoryStream.Write(treeObj.hash, 0, treeObj.hash.Length);
-
-            var data = memoryStream.ToArray();
-            return data;
-
-        }
-
-        public void AssembleTreeEntry(TreeObj treeObjects, MemoryStream memoryStream)
-        {
-           
-        }
-
-        public byte[] AssembleTree(byte[] body)
-        {
             byte[] header = Encoding.UTF8.GetBytes($"tree {body.Length}\0");
 
-            using var memoryStream = new MemoryStream();
-
             memoryStream.Write(header, 0, header.Length);
-            memoryStream.Write(body, 0, body.Length);
+            body.Position = 0; // Reset the position of the body stream to the beginning
+            body.WriteTo(memoryStream);
 
             var data = memoryStream.ToArray();
             return data;
@@ -73,7 +87,6 @@
             memoryStream.Write(fileContent, 0, fileContent.Length);
 
             var data = memoryStream.ToArray();
-
             return data;
         }
 

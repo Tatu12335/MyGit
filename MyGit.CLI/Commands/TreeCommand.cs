@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Spectre.Console.Cli;
+using Spectre.Console;
 
 namespace MyGit.CLI.Commands
 {
@@ -30,6 +31,7 @@ namespace MyGit.CLI.Commands
             if (settings.Write)
             {
                 var ksadksad = this._fileHandlingOrchestration.AssembleTree(settings.path);
+                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(Convert.ToHexString(ksadksad))}[/]");
             }
 
             return 0;

@@ -15,11 +15,13 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public Task CompressBlob(byte[] blobData, string outputFilePath);
 
-        public byte[] AssembleTree(byte[] tree);
+        public byte[] AssembleTree(MemoryStream body);
 
-        public byte[] AssembleFileEntry(TreeObj treeObj);
+        public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs);
 
-        public string[] SortEntriesFilesAlphabetically(string[] filenames);
+        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs);
+
+        public string ConvertToASCII(byte[] data);
 
 
     }
