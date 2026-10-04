@@ -8,7 +8,7 @@ namespace MyGit.Core.Domain
     {
         public string mode { get; set; }
 
-        public string filename { get; set; }
+        public string name { get; set; }
 
         public byte[] hash { get; set; }
     }

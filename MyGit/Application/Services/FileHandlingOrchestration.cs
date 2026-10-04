@@ -89,36 +89,37 @@ namespace MyGit.Core.Application.Services
 
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
-               // AnsiConsole.MarkupLine($"[blue]info:[/]  Processing directory {Markup.Escape(dir)}");
-                this.AssembleTree(dir);
+                TreeObj treeObj = new TreeObj();
+
+                treeObj.name = Path.GetFileName(dir);
+                treeObj.mode = "040000";
+                treeObj.hash = this.AssembleTree(dir);
+
+                treeObjects.Add(treeObj);
             }
 
             foreach (var file in Directory.GetFiles(directoryPath))
             {
                 TreeObj treeObj = new TreeObj();
 
-                treeObj.filename = Path.GetFileName(file);
-
-                //AnsiConsole.MarkupLine($"[blue]info:[/]  Processing file {Markup.Escape(file)}");
-
-                treeObj.hash =  this.AssembleFileData(file).GetAwaiter().GetResult();
+                treeObj.name = Path.GetFileName(file);
+                var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
+                treeObj.hash = fileData;
                 treeObj.mode = "100644";
 
                 treeObjects.Add(treeObj);
-
             }
 
-            var fileEntries = new List<byte[]>();
-            foreach (var treeObjs in treeObjects)
-            {
+            List<TreeObj> sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+            MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
 
-                var fileEntry = this._handleFiles.AssembleFileEntry(treeObjs);
-                fileEntries.Add(fileEntry);
-                AnsiConsole.MarkupLine($"[green]success:[/]  Assembled file entry for {Markup.Escape(treeObjs.filename)}");
+            byte[] tree = this._handleFiles.AssembleTree(entryBody);
+            byte[] hash = this._handleFiles.CalculateHash(tree);
+            string ascii = this._handleFiles.ConvertToASCII(tree);
 
-            }
-
-            return new byte[0]; // Placeholder return value
+            AnsiConsole.MarkupLine($"[blue]info:[/]  string tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(ascii)}");
+            //AnsiConsole.MarkupLine($"[blue]info:[/]  Assembled tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(BitConverter.ToString(hash).Replace("-", ""))}");
+            return hash; // Placeholder return value
         }
     }
 }
