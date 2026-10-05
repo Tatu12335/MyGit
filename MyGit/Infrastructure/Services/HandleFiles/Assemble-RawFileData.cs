@@ -11,6 +11,7 @@
     using MyGit.Core.Application.Interfaces.HandleFiles;
     using Spectre.Console;
     using Domain;
+    using Spectre.Console.Cli;
 
     public class Assemble_RawFileData : IHandleFiles
     {
@@ -28,8 +29,8 @@
         // this seems to be the problem as of now, fix it later!
         public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
         {
-            var sortedTreeObjs = treeObjs.OrderBy(obj => obj.name, StringComparer.Ordinal).ToList();
-            return sortedTreeObjs;
+            var ordered = treeObjs.OrderBy(obj => obj.mode == "040000" ? obj.name + "/" : obj.name);
+            return ordered.ToList();
         }
 
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)

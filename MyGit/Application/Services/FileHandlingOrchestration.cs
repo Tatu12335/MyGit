@@ -92,6 +92,7 @@ namespace MyGit.Core.Application.Services
                 TreeObj treeObj = new TreeObj();
 
                 treeObj.name = Path.GetFileName(dir);
+
                 treeObj.mode = "040000";
                 treeObj.hash = this.AssembleTree(dir);
 
@@ -110,14 +111,20 @@ namespace MyGit.Core.Application.Services
                 treeObjects.Add(treeObj);
             }
 
-            List<TreeObj> sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+            var sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+
+            foreach (var entry in sortedTreeObjects)
+            {
+                AnsiConsole.MarkupLine($"[purple]info:[/] : {Markup.Escape(entry.name)}");
+            }
+
             MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
 
             byte[] tree = this._handleFiles.AssembleTree(entryBody);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             string ascii = this._handleFiles.ConvertToASCII(tree);
 
-            AnsiConsole.MarkupLine($"[blue]info:[/]  string tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(ascii)}");
+            //AnsiConsole.MarkupLine($"[blue]info:[/]  string tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(ascii)}");
             //AnsiConsole.MarkupLine($"[blue]info:[/]  Assembled tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(BitConverter.ToString(hash).Replace("-", ""))}");
             return hash; // Placeholder return value
         }
