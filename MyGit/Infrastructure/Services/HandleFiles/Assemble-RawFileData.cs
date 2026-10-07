@@ -1,5 +1,10 @@
 ﻿namespace MyGit.Core.Infrastructure.Services.HandleFiles
 {
+    using Domain;
+    using Microsoft.VisualBasic;
+    using MyGit.Core.Application.Interfaces.HandleFiles;
+    using Spectre.Console;
+    using Spectre.Console.Cli;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -7,9 +12,6 @@
     using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
-    using Microsoft.VisualBasic;
-    using MyGit.Core.Application.Interfaces.HandleFiles;
-    using Spectre.Console;
 
     public class Assemble_RawFileData : IHandleFiles
     {
@@ -17,19 +19,62 @@
         // it shouldnt be the amount of characters in the file content,
         // because some characters can be more than 1 byte in size.
         // Also remember to use the correct encoding when converting the file content to bytes.
+
+        // I realize that the ReadFile is not really necessary, but i will keep it for now, because it is already in use.
         public async Task<byte[]> ReadFile(string filePath)
         {
             return await File.ReadAllBytesAsync(filePath);
         }
 
-        public byte[] AssembleTree(byte[] tree)
+        // this seems to be the problem as of now, fix it later!
+        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
         {
-            byte[] header = Encoding.UTF8.GetBytes($"tree {tree.Length}\0");
+            var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name)
+                .ToList();
 
+            return treeObjs;
+        }
+
+        public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
+        {
+            var memoryStream = new MemoryStream();
+            foreach (var treeObj in treeObjs)
+            {
+                var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
+
+                memoryStream.Write(header, 0, header.Length);
+                memoryStream.Write(treeObj.hash, 0, treeObj.hash.Length);
+            }
+
+            return memoryStream;
+
+        }
+
+        public string ConvertToASCII(byte[] data)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var b in data)
+            {
+                if (b >= 32 && b <= 126)
+                {
+                    sb.Append(Convert.ToChar(b));
+                }
+
+                sb.Append(b.ToString("X2")); // Convert to hexadecimal string representation
+            }
+
+            return sb.ToString();
+        }
+
+        public byte[] AssembleTree(MemoryStream body)
+        {
             using var memoryStream = new MemoryStream();
+            byte[] header = Encoding.UTF8.GetBytes($"tree {body.Length}\0");
 
             memoryStream.Write(header, 0, header.Length);
-            memoryStream.Write(tree, 0, tree.Length);
+            body.Position = 0; // Reset the position of the body stream to the beginning
+            body.WriteTo(memoryStream);
 
             var data = memoryStream.ToArray();
             return data;
@@ -45,38 +90,7 @@
             memoryStream.Write(fileContent, 0, fileContent.Length);
 
             var data = memoryStream.ToArray();
-
             return data;
-        }
-
-        public string ListFilesAndDirectories(string directoryPath)
-        {
-            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
-            {
-                AnsiConsole.MarkupLine($"[yellow]warning:[/]  Skipping directory {Markup.Escape(directoryPath)}");
-                directoryPath = string.Empty;
-                return directoryPath;
-            }
-
-            if (directoryPath == string.Empty)
-            {
-                AnsiConsole.MarkupLine($"[red]error:[/]  Directory path is null or empty");
-                return string.Empty;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var dir in Directory.GetDirectories(directoryPath))
-            {
-                sb.AppendLine($"dir: {dir}");
-                sb.AppendLine(ListFilesAndDirectories(dir));
-            }
-
-            foreach (var file in Directory.GetFiles(directoryPath))
-            {
-                sb.AppendLine($"file: {file}");
-            }
-
-            return sb.ToString();
         }
 
         public byte[] CalculateHash(byte[] data)

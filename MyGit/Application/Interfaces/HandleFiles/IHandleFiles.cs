@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyGit.Core.Domain;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,8 +15,14 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public Task CompressBlob(byte[] blobData, string outputFilePath);
 
-        public string ListFilesAndDirectories(string directoryPath);
+        public byte[] AssembleTree(MemoryStream body);
 
-        public byte[] AssembleTree(byte[] tree);
+        public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs);
+
+        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs);
+
+        public string ConvertToASCII(byte[] data);
+
+
     }
 }

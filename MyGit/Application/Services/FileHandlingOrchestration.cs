@@ -1,8 +1,10 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
+using MyGit.Core.Domain;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Channels;
 
 namespace MyGit.Core.Application.Services
 {
@@ -42,18 +44,88 @@ namespace MyGit.Core.Application.Services
             return hash;
         }
 
-        public string DisplayTree(string path)
+        public void BuildTreeString(string directoryPath)
         {
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(directoryPath))
             {
-                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(path)} not found");
-                return null;
+                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
+                return;
             }
 
-            string tree = this._handleFiles.ListFilesAndDirectories(path);
-            AnsiConsole.MarkupLine($"[green]Directory tree for {Markup.Escape(path)}:[/]");
-            AnsiConsole.MarkupLine(tree);
-            return tree;
+            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
+            {
+                return;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var dir in Directory.GetDirectories(directoryPath))
+            {
+                sb.AppendLine($"dir: {dir}");
+                this.BuildTreeString(dir);
+            }
+
+            foreach (var file in Directory.GetFiles(directoryPath))
+            {
+                sb.AppendLine($"file: {file}");
+            }
+
+            AnsiConsole.MarkupLine(sb.ToString());
+        }
+
+        public byte[] AssembleTree(string directoryPath)
+        {
+            var treeObjects = new List<TreeObj>();
+            if (!Directory.Exists(directoryPath))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
+                return new byte[0];
+            }
+
+            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
+            {
+                AnsiConsole.MarkupLine($"[yellow]warning:[/]  Skipping directory {Markup.Escape(directoryPath)}");
+                return new byte[0];
+            }
+
+            foreach (var dir in Directory.GetDirectories(directoryPath))
+            {
+                TreeObj treeObj = new TreeObj();
+
+                treeObj.name = Path.GetFileName(dir);
+
+                treeObj.mode = "40000";
+                treeObj.hash = this.AssembleTree(dir);
+
+                treeObjects.Add(treeObj);
+            }
+
+            foreach (var file in Directory.GetFiles(directoryPath))
+            {
+                TreeObj treeObj = new TreeObj();
+
+                treeObj.name = Path.GetFileName(file);
+                var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
+                treeObj.hash = fileData;
+                treeObj.mode = "100644";
+
+                treeObjects.Add(treeObj);
+            }
+
+            var sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+           /*foreach (var entry in sortedTreeObjects)
+            {
+                AnsiConsole.MarkupLine($"[purple]info:[/] : {Markup.Escape(entry.name)}");
+            }*/
+
+            MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
+
+            byte[] tree = this._handleFiles.AssembleTree(entryBody);
+            byte[] hash = this._handleFiles.CalculateHash(tree);
+            string ascii = this._handleFiles.ConvertToASCII(tree);
+
+            //AnsiConsole.MarkupLine($"[blue]info:[/]  string tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(ascii)}");
+            //AnsiConsole.MarkupLine($"[blue]info:[/]  Assembled tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(BitConverter.ToString(hash).Replace("-", ""))}");
+            return hash; // Placeholder return value
         }
     }
 }

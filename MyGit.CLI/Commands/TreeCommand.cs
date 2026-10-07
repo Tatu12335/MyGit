@@ -3,15 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Spectre.Console.Cli;
+using Spectre.Console;
 
 namespace MyGit.CLI.Commands
 {
-    public class TreeCommand : Command<TreeCommand.Settings>
+    public class TreeCommand : AsyncCommand<TreeCommand.Settings>
     {
         public class Settings : CommandSettings
         {
             [CommandArgument(0, "<path>")]
-            public string path { get; set; } = string.Empty;
+            public string path { get; set; }
 
             [CommandOption("-w|--write")]
             public bool Write { get; set; }
@@ -24,12 +25,14 @@ namespace MyGit.CLI.Commands
             this._fileHandlingOrchestration = fileHandlingOrchestration;
         }
 
-        protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken = default)
+        protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-            this._fileHandlingOrchestration.DisplayTree(settings.path);
+            // this._fileHandlingOrchestration.BuildTreeString(settings.path);
             if (settings.Write)
             {
-                
+                var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
+                var hex = Convert.ToHexString(hash).ToLowerInvariant();
+                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
             }
 
             return 0;
