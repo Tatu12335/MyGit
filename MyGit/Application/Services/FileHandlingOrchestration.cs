@@ -93,7 +93,7 @@ namespace MyGit.Core.Application.Services
 
                 treeObj.name = Path.GetFileName(dir);
 
-                treeObj.mode = "040000";
+                treeObj.mode = "40000";
                 treeObj.hash = this.AssembleTree(dir);
 
                 treeObjects.Add(treeObj);
@@ -112,11 +112,10 @@ namespace MyGit.Core.Application.Services
             }
 
             var sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
-
-            foreach (var entry in sortedTreeObjects)
+           /*foreach (var entry in sortedTreeObjects)
             {
                 AnsiConsole.MarkupLine($"[purple]info:[/] : {Markup.Escape(entry.name)}");
-            }
+            }*/
 
             MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
 

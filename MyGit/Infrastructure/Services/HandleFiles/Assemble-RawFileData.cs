@@ -1,5 +1,10 @@
 ﻿namespace MyGit.Core.Infrastructure.Services.HandleFiles
 {
+    using Domain;
+    using Microsoft.VisualBasic;
+    using MyGit.Core.Application.Interfaces.HandleFiles;
+    using Spectre.Console;
+    using Spectre.Console.Cli;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -7,11 +12,6 @@
     using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
-    using Microsoft.VisualBasic;
-    using MyGit.Core.Application.Interfaces.HandleFiles;
-    using Spectre.Console;
-    using Domain;
-    using Spectre.Console.Cli;
 
     public class Assemble_RawFileData : IHandleFiles
     {
@@ -29,8 +29,10 @@
         // this seems to be the problem as of now, fix it later!
         public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
         {
-            var ordered = treeObjs.OrderBy(obj => obj.mode == "040000" ? obj.name + "/" : obj.name);
-            return ordered.ToList();
+            var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name)
+                .ToList();
+
+            return treeObjs;
         }
 
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
@@ -54,7 +56,7 @@
 
             foreach (var b in data)
             {
-                if (b >= 32 && b <= 127)
+                if (b >= 32 && b <= 126)
                 {
                     sb.Append(Convert.ToChar(b));
                 }
