@@ -110,7 +110,7 @@ namespace MyGit.Core.Application.Services
                 treeObjects.Add(treeObj);
             }
 
-            List<TreeObj> sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+            List<TreeObj> sortedTreeObjects = this._handleFiles.SortEntries(treeObjects);
             MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
 
             byte[] tree = this._handleFiles.AssembleTree(entryBody);

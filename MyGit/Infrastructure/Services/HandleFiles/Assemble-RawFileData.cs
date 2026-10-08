@@ -26,7 +26,7 @@
         }
 
         // this seems to be the problem as of now, fix it later!
-        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
+        public List<TreeObj> SortEntries(List<TreeObj> treeObjs)
         {
             var sortedTreeObjs = treeObjs.OrderBy(obj => obj.name, StringComparer.Ordinal).ToList();
             return sortedTreeObjs;

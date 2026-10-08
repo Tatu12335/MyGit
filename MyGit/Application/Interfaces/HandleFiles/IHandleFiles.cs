@@ -19,7 +19,7 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs);
 
-        public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs);
+        public List<TreeObj> SortEntries(List<TreeObj> treeObjs);
 
         public string ConvertToASCII(byte[] data);
 
