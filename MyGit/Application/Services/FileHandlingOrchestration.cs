@@ -140,7 +140,7 @@ namespace MyGit.Core.Application.Services
 
         public byte[]? SortAndAssemble(List<TreeObj> objects)
         {
-            var sorted = this._handleFiles.SortEntriesFilesAlphabetically(objects);
+            var sorted = this._handleFiles.SortEntries(objects);
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
