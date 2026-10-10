@@ -52,7 +52,10 @@ namespace MyGit.Core.Application.Services
                 return;
             }
 
-            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
+            if (directoryPath.Contains(".mygit") 
+                || directoryPath.Contains(".mygit/") 
+                || directoryPath.Contains("MyGit.CLI")
+                || directoryPath.Contains(".git"))
             {
                 return;
             }
@@ -81,18 +84,18 @@ namespace MyGit.Core.Application.Services
                 return new byte[0];
             }
 
-            if (directoryPath.Contains(".mygit") || directoryPath.Contains(".mygit/") || directoryPath.Contains("MyGit.CLI"))
-            {
-                AnsiConsole.MarkupLine($"[yellow]warning:[/]  Skipping directory {Markup.Escape(directoryPath)}");
-                return new byte[0];
-            }
-
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
+                if (dir.Contains(".git") || dir.Contains(".mygit"))
+                    continue;
+
                 TreeObj treeObj = new TreeObj();
 
                 treeObj.name = Path.GetFileName(dir);
-                treeObj.mode = "040000";
+                if (treeObj.name == (".git") || treeObj.name ==(".mygit"))
+                    continue;
+
+                treeObj.mode = "40000";
                 treeObj.hash = this.AssembleTree(dir);
 
                 treeObjects.Add(treeObj);
@@ -103,6 +106,9 @@ namespace MyGit.Core.Application.Services
                 TreeObj treeObj = new TreeObj();
 
                 treeObj.name = Path.GetFileName(file);
+                if (treeObj.name == (".git") || treeObj.name == (".mygit"))
+                    continue;
+
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
                 treeObj.hash = fileData;
                 treeObj.mode = "100644";
@@ -110,15 +116,15 @@ namespace MyGit.Core.Application.Services
                 treeObjects.Add(treeObj);
             }
 
-            List<TreeObj> sortedTreeObjects = this._handleFiles.SortEntries(treeObjects);
+            var sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
+
             MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
 
             byte[] tree = this._handleFiles.AssembleTree(entryBody);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             string ascii = this._handleFiles.ConvertToASCII(tree);
 
-            AnsiConsole.MarkupLine($"[blue]info:[/]  string tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(ascii)}");
-            //AnsiConsole.MarkupLine($"[blue]info:[/]  Assembled tree for directory {Markup.Escape(directoryPath)} : {Markup.Escape(BitConverter.ToString(hash).Replace("-", ""))}");
+
             return hash; // Placeholder return value
         }
     }

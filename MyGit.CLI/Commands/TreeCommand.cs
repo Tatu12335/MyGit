@@ -30,8 +30,9 @@ namespace MyGit.CLI.Commands
             // this._fileHandlingOrchestration.BuildTreeString(settings.path);
             if (settings.Write)
             {
-                var ksadksad = this._fileHandlingOrchestration.AssembleTree(settings.path);
-                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(Convert.ToHexString(ksadksad))}[/]");
+                var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
+                var hex = Convert.ToHexString(hash).ToLowerInvariant();
+                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
             }
 
             return 0;
