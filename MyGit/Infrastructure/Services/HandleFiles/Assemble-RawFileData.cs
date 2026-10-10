@@ -29,10 +29,10 @@
         // this seems to be the problem as of now, fix it later!
         public List<TreeObj> SortEntriesFilesAlphabetically(List<TreeObj> treeObjs)
         {
-            var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name)
+            var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name, StringComparer.Ordinal)
                 .ToList();
 
-            return treeObjs;
+            return ordered;
         }
 
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
@@ -40,9 +40,7 @@
             var memoryStream = new MemoryStream();
 
             foreach (var treeObj in treeObjs)
-            {
-                if (treeObj.hash == null)
-                    return null;
+            { 
                 var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
 
                 memoryStream.Write(header, 0, header.Length);

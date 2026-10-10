@@ -82,12 +82,13 @@ namespace MyGit.Core.Application.Services
             if (!Directory.Exists(directoryPath))
             {
                 AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
-                return new byte[0];
+                return null;
             }
-
+         
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
-                if (dir.Contains(".git") || dir.Contains(".mygit"))
+                var name = Path.GetFileName(dir); 
+                if(name == ".git" || name == ".mygit")
                     continue;
 
                 var Hash = this.AssembleTree(dir);
@@ -97,10 +98,7 @@ namespace MyGit.Core.Application.Services
 
                 TreeObj treeObj = new TreeObj();
 
-                treeObj.name = Path.GetFileName(dir);
-
-                if (treeObj.name == ".git" || treeObj.name == ".mygit")
-                    continue;
+                treeObj.name = name;
 
                 treeObj.mode = "40000";
                 treeObj.hash = Hash;
@@ -110,25 +108,34 @@ namespace MyGit.Core.Application.Services
 
             foreach (var file in Directory.GetFiles(directoryPath))
             {
-                if (file.Contains(".git") || file.Contains(".mygit"))
+                var name = Path.GetFileName(file);
+                if (name == ".mygit" || name == ".git")
                     continue;
 
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
                 TreeObj treeObj = new TreeObj();
 
-                treeObj.name = Path.GetFileName(file);
+                treeObj.name = name;
                 treeObj.hash = fileData;
                 treeObj.mode = "100644";
+
+
 
                 treeObjects.Add(treeObj);
 
 
             }
-            if (!treeObjects.Any())
-                return null;
+
+            if (treeObjects.Count == 0)
+                 return null;
+            
+            foreach(var entry in treeObjects)
+            {
+                Console.WriteLine($"{entry.mode} {entry.name} {Convert.ToHexString(entry.hash).ToLowerInvariant()}");
+            }
 
             var hash = this.SortAndAssemble(treeObjects);
-            return hash; // Placeholder return value
+            return hash;
         }
 
         public byte[]? SortAndAssemble(List<TreeObj> objects)
@@ -137,11 +144,9 @@ namespace MyGit.Core.Application.Services
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
-            foreach (var entry in sorted)
-            {
-                AnsiConsole.MarkupLine($"{Markup.Escape(entry.name)} {Markup.Escape(entry.mode)} {Markup.Escape(Convert.ToHexString(entry.hash).ToLowerInvariant())}");
-            }
-            return hash;
+            
+
+            return hash; 
         }
     }
 }
