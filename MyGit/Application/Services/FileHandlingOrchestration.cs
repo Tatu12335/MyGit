@@ -123,7 +123,8 @@ namespace MyGit.Core.Application.Services
             byte[] tree = this._handleFiles.AssembleTree(entryBody);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             string ascii = this._handleFiles.ConvertToASCII(tree);
-            AnsiConsole.MarkupLine(Markup.Escape(Convert.ToHexString(tree).ToLowerInvariant()));
+
+
             return hash; // Placeholder return value
         }
     }
