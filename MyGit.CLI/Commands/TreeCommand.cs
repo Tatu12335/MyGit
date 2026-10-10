@@ -31,10 +31,15 @@ namespace MyGit.CLI.Commands
             if (settings.Write)
             {
                 var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
-                var hex = Convert.ToHexString(hash).ToLowerInvariant();
-                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
+                if (hash != null)
+                {
+                    var hex = Convert.ToHexString(hash).ToLowerInvariant();
+                    AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
+                    return 0;
+                }
             }
 
+            AnsiConsole.MarkupLine($"[green]nothing to commit[/]");
             return 0;
         }
     }
