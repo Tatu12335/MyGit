@@ -3,6 +3,7 @@ using MyGit.Core.Domain;
 using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Channels;
 
@@ -74,8 +75,8 @@ namespace MyGit.Core.Application.Services
 
             AnsiConsole.MarkupLine(sb.ToString());
         }
-
-        public byte[] AssembleTree(string directoryPath)
+        
+        public byte[]? AssembleTree(string directoryPath)
         {
             var treeObjects = new List<TreeObj>();
             if (!Directory.Exists(directoryPath))
@@ -89,43 +90,58 @@ namespace MyGit.Core.Application.Services
                 if (dir.Contains(".git") || dir.Contains(".mygit"))
                     continue;
 
+                var Hash = this.AssembleTree(dir);
+
+                if (Hash == null)
+                    continue;
+
                 TreeObj treeObj = new TreeObj();
 
                 treeObj.name = Path.GetFileName(dir);
-                if (treeObj.name == (".git") || treeObj.name ==(".mygit"))
+
+                if (treeObj.name == ".git" || treeObj.name == ".mygit")
                     continue;
 
                 treeObj.mode = "40000";
-                treeObj.hash = this.AssembleTree(dir);
+                treeObj.hash = Hash;
 
                 treeObjects.Add(treeObj);
             }
 
             foreach (var file in Directory.GetFiles(directoryPath))
             {
-                TreeObj treeObj = new TreeObj();
-
-                treeObj.name = Path.GetFileName(file);
-                if (treeObj.name == (".git") || treeObj.name == (".mygit"))
+                if (file.Contains(".git") || file.Contains(".mygit"))
                     continue;
 
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
+                TreeObj treeObj = new TreeObj();
+
+                treeObj.name = Path.GetFileName(file);
                 treeObj.hash = fileData;
                 treeObj.mode = "100644";
 
                 treeObjects.Add(treeObj);
+
+
             }
+            if (!treeObjects.Any())
+                return null;
 
-            var sortedTreeObjects = this._handleFiles.SortEntriesFilesAlphabetically(treeObjects);
-
-            MemoryStream entryBody = this._handleFiles.AssembleEntryBody(sortedTreeObjects);
-
-            byte[] tree = this._handleFiles.AssembleTree(entryBody);
-            byte[] hash = this._handleFiles.CalculateHash(tree);
-            string ascii = this._handleFiles.ConvertToASCII(tree);
-
-
+            var hash = this.SortAndAssemble(treeObjects);
             return hash; // Placeholder return value
+        }
+
+        public byte[]? SortAndAssemble(List<TreeObj> objects)
+        {
+            var sorted = this._handleFiles.SortEntriesFilesAlphabetically(objects);
+            MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
+            byte[] tree = this._handleFiles.AssembleTree(body);
+            byte[] hash = this._handleFiles.CalculateHash(tree);
+            foreach (var entry in sorted)
+            {
+                AnsiConsole.MarkupLine($"{Markup.Escape(entry.name)} {Markup.Escape(entry.mode)} {Markup.Escape(Convert.ToHexString(entry.hash).ToLowerInvariant())}");
+            }
+            return hash;
         }
     }
 }
