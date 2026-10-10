@@ -20,7 +20,7 @@ namespace MyGit.CLI.Commands
         }
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-
+            return 0;
         }
     }
 }
