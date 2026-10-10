@@ -38,8 +38,11 @@
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
         {
             var memoryStream = new MemoryStream();
+
             foreach (var treeObj in treeObjs)
             {
+                if (treeObj.hash == null)
+                    return null;
                 var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
 
                 memoryStream.Write(header, 0, header.Length);
