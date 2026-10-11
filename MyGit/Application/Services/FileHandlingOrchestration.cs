@@ -119,20 +119,11 @@ namespace MyGit.Core.Application.Services
                 treeObj.hash = fileData;
                 treeObj.mode = "100644";
 
-
-
                 treeObjects.Add(treeObj);
-
-
             }
 
             if (treeObjects.Count == 0)
                  return null;
-            
-            foreach(var entry in treeObjects)
-            {
-                Console.WriteLine($"{entry.mode} {entry.name} {Convert.ToHexString(entry.hash).ToLowerInvariant()}");
-            }
 
             var hash = this.SortAndAssemble(treeObjects);
             return hash;
@@ -140,13 +131,11 @@ namespace MyGit.Core.Application.Services
 
         public byte[]? SortAndAssemble(List<TreeObj> objects)
         {
-            var sorted = this._handleFiles.SortEntries(objects);
+            List<TreeObj> sorted = this._handleFiles.SortEntries(objects);
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
-            
-
-            return hash; 
+            return hash;
         }
     }
 }

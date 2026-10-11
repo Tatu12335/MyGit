@@ -5,6 +5,7 @@ using MyGit.CLI.Commands;
 using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Application.Services;
 using MyGit.Core.Infrastructure.Services.HandleFiles;
+using MyGit.Core.Infrastructure.Services.NewFolder;
 using MyGit.Core.Middleware;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -16,11 +17,14 @@ class Program
         var services = new ServiceCollection();
 
         services.AddTransient<IHandleFiles, Assemble_RawFileData>();
+        services.AddTransient<ICommit, Commit>();
+        services.AddTransient<CommitOrchestrator>();
         services.AddTransient<FileHandlingOrchestration>();
         services.AddLogging(configure => configure.AddConsole());
         services.AddTransient<InitCommand>();
         services.AddTransient<HashObjectCommand>();
         services.AddTransient<TreeCommand>();
+        services.AddTransient<CommitCommand>();
 
         var register = new TypeRegistrar(services);
 
@@ -28,7 +32,8 @@ class Program
         // Commands
         ui.Configure(config =>
         {
-            config.SetApplicationName("MyGit");
+            config.SetApplicationName("mygit");
+
             config.AddCommand<InitCommand>("init")
                 .WithDescription("Creates a new empty repository");
 
@@ -37,6 +42,10 @@ class Program
 
             config.AddCommand<TreeCommand>("tree")
                 .WithDescription("Displays the contents of a directory and its subdirectories");
+
+            config.AddCommand<CommitCommand>("commit")
+                .WithDescription("Commit changes");
+
 
             config.SetExceptionHandler((ex, context) =>
             {
