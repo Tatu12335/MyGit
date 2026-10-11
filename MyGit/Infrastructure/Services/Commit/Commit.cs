@@ -9,11 +9,19 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
     {
         public byte[] AssembleCommitHeader(MemoryStream body)
         {
+            var stream = new MemoryStream();
             var header = Encoding.UTF8.GetBytes($"commit {body.Length}\0");
+
+            stream.Write(header, 0, header.Length);
+            body.Position = 0;
+            body.WriteTo(stream);
+
+            var fullData = stream.ToArray();
+            return fullData;
         }
         public MemoryStream AssembleCommitBody()
         {
-
+            return new MemoryStream();
         }
     }
 }
