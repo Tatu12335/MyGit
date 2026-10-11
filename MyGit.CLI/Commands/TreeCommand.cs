@@ -27,7 +27,6 @@ namespace MyGit.CLI.Commands
 
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-            // this._fileHandlingOrchestration.BuildTreeString(settings.path);
             if (settings.Write)
             {
                 var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
