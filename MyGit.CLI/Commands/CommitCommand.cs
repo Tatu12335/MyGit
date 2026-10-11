@@ -11,26 +11,26 @@ namespace MyGit.CLI.Commands
     {
         public class Settings : CommandSettings
         {
-            [CommandOption("-m|--message <MESSAGE>")]
+            [CommandOption("-m|--message <message>")]
             public required string message { get; set; }
 
-            [CommandOption("--author <AUTHOR>")]
+            [CommandOption("--author <author>")]
             public required string author { get; set; }
 
-            [CommandOption("--email <EMAIL>")]
+            [CommandOption("--email <email>")]
             public required string email { get; set; }
         }
 
-        private readonly FileHandlingOrchestration _fileHandlingOrchestration;
+        private readonly CommitOrchestrator _orchestrator;
 
-        public CommitCommand(FileHandlingOrchestration fileHandlingOrchestration)
+        public CommitCommand(CommitOrchestrator orchestrator)
         {
-            this._fileHandlingOrchestration = fileHandlingOrchestration;
+            this._orchestrator = orchestrator;
         }
 
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-            var validatedMessage = Validate(context, settings);
+            var validatedMessage = this.Validate(context, settings);
 
             if (!validatedMessage.Successful)
             {
