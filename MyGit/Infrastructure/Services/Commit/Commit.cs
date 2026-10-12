@@ -1,6 +1,5 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
-using System;
-using System.Collections.Generic;
+using Spectre.Console;
 using System.Text;
 
 namespace MyGit.Core.Infrastructure.Services.NewFolder
@@ -18,7 +17,21 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 
             var fullData = stream.ToArray();
             return fullData;
+
         }
+
+        public string Assembletz()
+        {
+            var now = DateTimeOffset.Now;
+            long seconds = now.ToUnixTimeSeconds();
+
+            string tz = now.ToString("zzz").Replace(":", "");
+
+            AnsiConsole.MarkupLine($"[green]seconds: {seconds}, tz: {tz}[/]");
+            return tz;
+
+        }
+
         public MemoryStream AssembleCommitBody()
         {
             return new MemoryStream();

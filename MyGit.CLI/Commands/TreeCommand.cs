@@ -1,9 +1,6 @@
 ﻿using MyGit.Core.Application.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Spectre.Console.Cli;
 using Spectre.Console;
+using Spectre.Console.Cli;
 
 namespace MyGit.CLI.Commands
 {
@@ -14,8 +11,6 @@ namespace MyGit.CLI.Commands
             [CommandArgument(0, "<path>")]
             public string path { get; set; }
 
-            [CommandOption("-w|--write")]
-            public bool Write { get; set; }
         }
 
         private readonly FileHandlingOrchestration _fileHandlingOrchestration;
@@ -27,16 +22,16 @@ namespace MyGit.CLI.Commands
 
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-            if (settings.Write)
+
+
+            var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
+            if (hash != null)
             {
-                var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
-                if (hash != null)
-                {
-                    var hex = Convert.ToHexString(hash).ToLowerInvariant();
-                    AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
-                    return 0;
-                }
+                var hex = Convert.ToHexString(hash).ToLowerInvariant();
+                AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
+                return 0;
             }
+
 
             AnsiConsole.MarkupLine($"[green]nothing to commit[/]");
             return 0;

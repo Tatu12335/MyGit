@@ -1,7 +1,4 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.Core.Application.Services
 {
@@ -14,6 +11,11 @@ namespace MyGit.Core.Application.Services
         {
             this._commit = commit;
             this._handleFiles = handleFiles;
+        }
+
+        public void timeTest()
+        {
+            this._commit.Assembletz();
         }
 
         public void OrchestrateAssembly()

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MyGit.Core.Domain
+﻿namespace MyGit.Core.Domain
 {
     public class TreeObj
     {

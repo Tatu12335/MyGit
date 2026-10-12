@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MyGit.CLI.Commands;
 using MyGit.Core.Application.Interfaces.HandleFiles;
@@ -40,7 +39,7 @@ class Program
             config.AddCommand<HashObjectCommand>("hash-object")
                 .WithDescription("Calculates the hash of a file and stores it if needed");
 
-            config.AddCommand<TreeCommand>("tree")
+            config.AddCommand<TreeCommand>("write-tree")
                 .WithDescription("Displays the contents of a directory and its subdirectories");
 
             config.AddCommand<CommitCommand>("commit")
@@ -51,9 +50,9 @@ class Program
             {
                 AnsiConsole.MarkupLine($"[red]error:[/] {Markup.Escape(ex.Message)}");
 
-                #if DEBUG
-                    AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
-                #endif
+#if DEBUG
+                AnsiConsole.WriteException(ex, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+#endif
                 return 1;
 
             });

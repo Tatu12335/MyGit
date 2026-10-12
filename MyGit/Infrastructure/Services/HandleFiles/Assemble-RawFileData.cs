@@ -1,15 +1,10 @@
 ﻿namespace MyGit.Core.Infrastructure.Services.HandleFiles
 {
     using Domain;
-    using Microsoft.VisualBasic;
     using MyGit.Core.Application.Interfaces.HandleFiles;
-    using Spectre.Console;
-    using Spectre.Console.Cli;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO.Compression;
-    using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
 
@@ -40,7 +35,7 @@
             var memoryStream = new MemoryStream();
 
             foreach (var treeObj in treeObjs)
-            { 
+            {
                 var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
 
                 memoryStream.Write(header, 0, header.Length);
