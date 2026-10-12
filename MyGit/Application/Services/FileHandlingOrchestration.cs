@@ -1,11 +1,7 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
-using System.Threading.Channels;
 
 namespace MyGit.Core.Application.Services
 {
@@ -53,8 +49,8 @@ namespace MyGit.Core.Application.Services
                 return;
             }
 
-            if (directoryPath.Contains(".mygit") 
-                || directoryPath.Contains(".mygit/") 
+            if (directoryPath.Contains(".mygit")
+                || directoryPath.Contains(".mygit/")
                 || directoryPath.Contains("MyGit.CLI")
                 || directoryPath.Contains(".git"))
             {
@@ -75,7 +71,7 @@ namespace MyGit.Core.Application.Services
 
             AnsiConsole.MarkupLine(sb.ToString());
         }
-        
+
         public byte[]? AssembleTree(string directoryPath)
         {
             var treeObjects = new List<TreeObj>();
@@ -84,11 +80,11 @@ namespace MyGit.Core.Application.Services
                 AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
                 return null;
             }
-         
+
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
-                var name = Path.GetFileName(dir); 
-                if(name == ".git" || name == ".mygit")
+                var name = Path.GetFileName(dir);
+                if (name == ".git" || name == ".mygit")
                     continue;
 
                 var Hash = this.AssembleTree(dir);
@@ -123,7 +119,7 @@ namespace MyGit.Core.Application.Services
             }
 
             if (treeObjects.Count == 0)
-                 return null;
+                return null;
 
             var hash = this.SortAndAssemble(treeObjects);
             return hash;

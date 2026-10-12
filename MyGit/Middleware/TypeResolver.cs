@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Spectre.Console.Cli;
+﻿using Spectre.Console.Cli;
 
 namespace MyGit.Core.Middleware
 {
@@ -16,7 +13,7 @@ namespace MyGit.Core.Middleware
         public void Dispose()
         {
             if (this._provider is IDisposable disposable)
-                 disposable.Dispose();
+                disposable.Dispose();
         }
     }
 }

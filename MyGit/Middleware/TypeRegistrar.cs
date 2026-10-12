@@ -1,8 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MyGit.Core.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Spectre.Console.Cli;
 namespace MyGit.Core.Middleware
 {

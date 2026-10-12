@@ -1,9 +1,6 @@
 ﻿using MyGit.Core.Application.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.CLI.Commands
 {
@@ -37,7 +34,7 @@ namespace MyGit.CLI.Commands
                 AnsiConsole.MarkupLine("[red] commit message cannot be empty![/]");
                 return 1;
             }
-
+            this._orchestrator.timeTest();
             return 0;
         }
     }

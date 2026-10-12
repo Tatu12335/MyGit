@@ -1,7 +1,4 @@
 ﻿using MyGit.Core.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.Core.Application.Interfaces.HandleFiles
 {
