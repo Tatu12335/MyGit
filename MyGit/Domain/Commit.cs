@@ -8,8 +8,13 @@
 
         public string author { get; set; }
 
+        public string email { get; set; }
+
         public long seconds { get; set; }
+
         public string tz { get; set; }
+
+        public string message { get; set; }
 
     }
 }

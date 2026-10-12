@@ -18,9 +18,13 @@ namespace MyGit.Core.Application.Services
             this._commit.Assembletz();
         }
 
-        public void OrchestrateAssembly()
+        public string OrchestrateAssembly(string parentHex, string treeHex, string message, string author, string email)
         {
-
+            var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
+            var commitStream = this._commit.AssembleCommitBody(obj);
+            var commit = this._commit.AssembleCommitHeader(commitStream);
+            var hash = this._handleFiles.CalculateHash(commit);
+            return Convert.ToHexString(hash).ToLowerInvariant();
         }
     }
 }
