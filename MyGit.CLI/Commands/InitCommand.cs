@@ -24,8 +24,8 @@ namespace MyGit.CLI.Commands
 
             Directory.CreateDirectory(gitDir);
             Directory.CreateDirectory(Path.Combine(gitDir, "objects"));
-            Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
-
+            var refs = Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
+            Directory.CreateDirectory(Path.Combine(refs.FullName, "heads"));
             AnsiConsole.MarkupLine($"[green]Initialized empty MyGit repository in {Markup.Escape(gitDir)}[/]");
             return 0;
         }
