@@ -1,6 +1,7 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
+using System.IO.Compression;
 using System.Text;
 
 namespace MyGit.Core.Application.Services
@@ -88,8 +89,6 @@ namespace MyGit.Core.Application.Services
         public string GiveAndValidateObjectPath(string hashHex, string path)
         {
             string objPath = this._handleFiles.CreateObjectPath(hashHex, path);
-            
-            Console.WriteLine($"writing object: {hashHex}, to path: {path}");
             return objPath;
         }
 
@@ -148,8 +147,6 @@ namespace MyGit.Core.Application.Services
             return hash;
         }
 
-      
-
         public byte[]? SortAndAssemble(List<TreeObj> objects,string path)
         {
             List<TreeObj> sorted = this._handleFiles.SortEntries(objects);
@@ -157,9 +154,13 @@ namespace MyGit.Core.Application.Services
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
-
+            var ascii = this._handleFiles.ConvertToASCII(tree);
+            Console.WriteLine(ascii);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
             WriteFileToMemory(tree, outputFile);
+
+
+
 
             return hash;
         }
