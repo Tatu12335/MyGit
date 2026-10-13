@@ -1,4 +1,5 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
+using Spectre.Console;
 
 namespace MyGit.Core.Application.Services
 {
@@ -6,11 +7,13 @@ namespace MyGit.Core.Application.Services
     {
         private readonly IHandleFiles _handleFiles;
         private readonly ICommit _commit;
+        private readonly FileHandlingOrchestration _fileHandling;
 
-        public CommitOrchestrator(IHandleFiles handleFiles, ICommit commit)
+        public CommitOrchestrator(IHandleFiles handleFiles, ICommit commit, FileHandlingOrchestration fileHandling)
         {
             this._commit = commit;
             this._handleFiles = handleFiles;
+            this._fileHandling = fileHandling;
         }
 
         public void timeTest()
@@ -18,8 +21,23 @@ namespace MyGit.Core.Application.Services
             this._commit.Assembletz();
         }
 
-        public string OrchestrateAssembly(string parentHex, string treeHex, string message, string author, string email)
+        public string GetAndAssembleTreeHash(string path)
         {
+            var tree = this._fileHandling.AssembleTree(path);
+            return Convert.ToHexString(tree).ToLowerInvariant();
+        }
+
+        public string OrchestrateAssembly(string path, string message, string author, string email)
+        {
+            string parentHex = string.Empty;
+            var treeHex = this.GetAndAssembleTreeHash(path);
+            if (File.Exists(".mygit\\refs\\heads\\main"))
+            {
+                parentHex = File.ReadAllText(".mygit\\refs\\heads\\main").Replace("\n", ""); 
+            }
+
+            
+
             var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
             var commitStream = this._commit.AssembleCommitBody(obj);
             var commit = this._commit.AssembleCommitHeader(commitStream);
