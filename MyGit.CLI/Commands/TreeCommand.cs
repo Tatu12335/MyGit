@@ -23,24 +23,17 @@ namespace MyGit.CLI.Commands
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
 
-            var gitDir = Path.Combine(settings.path, ".mygit");
+            var gitDir = Path.Combine(settings.path, ".mygit", "objects");
             if (!Directory.Exists(gitDir))
             {
                 AnsiConsole.MarkupLine($"[red]run \"init <path>\" to run![/]");
-                Console.WriteLine($"directory : {gitDir}");
                 return 1;
             }
 
-            var hash = this._fileHandlingOrchestration.AssembleTree(settings.path);
+            var hash = this._fileHandlingOrchestration.AssembleTree(settings.path, gitDir);
             if (hash != null)
             {
                 var hex = Convert.ToHexString(hash).ToLowerInvariant();
-                string folder = hex.Substring(0, 2);
-                string fileName = hex.Substring(2);
-                var objPath = Path.Combine(gitDir, "objects", folder, fileName);
-
-                this._fileHandlingOrchestration.WriteFileToMemory(hash, objPath);
-
                 AnsiConsole.MarkupLine($"[green]hash: {Markup.Escape(hex)}[/]");
                 return 0;
             }
