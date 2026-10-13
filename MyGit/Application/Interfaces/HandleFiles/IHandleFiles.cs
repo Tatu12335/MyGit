@@ -1,7 +1,4 @@
 ﻿using MyGit.Core.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.Core.Application.Interfaces.HandleFiles
 {
@@ -13,7 +10,7 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public byte[] CalculateHash(byte[] data);
 
-        public Task CompressBlob(byte[] blobData, string outputFilePath);
+        public Task CompressData(byte[] data, string outputFilePath);
 
         public byte[] AssembleTree(MemoryStream body);
 
@@ -22,6 +19,8 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
         public List<TreeObj> SortEntries(List<TreeObj> treeObjs);
 
         public string ConvertToASCII(byte[] data);
+
+        public string CreateObjectPath(string hashHex, string path);
 
 
     }

@@ -1,11 +1,8 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
+using System.IO.Compression;
 using System.Text;
-using System.Threading.Channels;
 
 namespace MyGit.Core.Application.Services
 {
@@ -16,6 +13,19 @@ namespace MyGit.Core.Application.Services
         public FileHandlingOrchestration(IHandleFiles handleFiles)
         {
             this._handleFiles = handleFiles;
+        }
+
+        // This is just a temp method
+        public void WriteTreeObjToMemory(string hex, string outputPath)
+        {
+            if (File.Exists(outputPath))
+            {
+                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(outputPath)} already exists");
+                return;
+            }
+
+            Directory.CreateDirectory(outputPath);
+
         }
 
         public void WriteFileToMemory(byte[] blobData, string outputFilePath)
@@ -33,7 +43,7 @@ namespace MyGit.Core.Application.Services
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
-            this._handleFiles.CompressBlob(blobData, outputFilePath);
+            this._handleFiles.CompressData(blobData, outputFilePath);
         }
 
         public async Task<byte[]> AssembleFileData(string filePath)
@@ -53,8 +63,8 @@ namespace MyGit.Core.Application.Services
                 return;
             }
 
-            if (directoryPath.Contains(".mygit") 
-                || directoryPath.Contains(".mygit/") 
+            if (directoryPath.Contains(".mygit")
+                || directoryPath.Contains(".mygit/")
                 || directoryPath.Contains("MyGit.CLI")
                 || directoryPath.Contains(".git"))
             {
@@ -75,23 +85,30 @@ namespace MyGit.Core.Application.Services
 
             AnsiConsole.MarkupLine(sb.ToString());
         }
-        
-        public byte[]? AssembleTree(string directoryPath)
+
+        public string GiveAndValidateObjectPath(string hashHex, string path)
         {
+            string objPath = this._handleFiles.CreateObjectPath(hashHex, path);
+            return objPath;
+        }
+
+        public byte[]? AssembleTree(string directoryPath, string objPath)
+        {
+
             var treeObjects = new List<TreeObj>();
             if (!Directory.Exists(directoryPath))
             {
                 AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
                 return null;
             }
-         
+
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
-                var name = Path.GetFileName(dir); 
-                if(name == ".git" || name == ".mygit")
+                var name = Path.GetFileName(dir);
+                if (name == ".git" || name == ".mygit")
                     continue;
 
-                var Hash = this.AssembleTree(dir);
+                var Hash = this.AssembleTree(dir, objPath);
 
                 if (Hash == null)
                     continue;
@@ -104,6 +121,8 @@ namespace MyGit.Core.Application.Services
                 treeObj.hash = Hash;
 
                 treeObjects.Add(treeObj);
+                
+
             }
 
             foreach (var file in Directory.GetFiles(directoryPath))
@@ -111,10 +130,9 @@ namespace MyGit.Core.Application.Services
                 var name = Path.GetFileName(file);
                 if (name == ".mygit" || name == ".git")
                     continue;
-
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
+               
                 TreeObj treeObj = new TreeObj();
-
                 treeObj.name = name;
                 treeObj.hash = fileData;
                 treeObj.mode = "100644";
@@ -123,18 +141,27 @@ namespace MyGit.Core.Application.Services
             }
 
             if (treeObjects.Count == 0)
-                 return null;
+                return null;
+            var hash = this.SortAndAssemble(treeObjects, objPath);
 
-            var hash = this.SortAndAssemble(treeObjects);
             return hash;
         }
 
-        public byte[]? SortAndAssemble(List<TreeObj> objects)
+        public byte[]? SortAndAssemble(List<TreeObj> objects,string path)
         {
             List<TreeObj> sorted = this._handleFiles.SortEntries(objects);
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
+            var hashHex = Convert.ToHexString(hash);
+            var ascii = this._handleFiles.ConvertToASCII(tree);
+            Console.WriteLine(ascii);
+            var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
+            WriteFileToMemory(tree, outputFile);
+
+
+
+
             return hash;
         }
     }

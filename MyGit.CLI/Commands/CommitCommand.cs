@@ -1,9 +1,6 @@
 ﻿using MyGit.Core.Application.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.CLI.Commands
 {
@@ -28,6 +25,7 @@ namespace MyGit.CLI.Commands
             this._orchestrator = orchestrator;
         }
 
+        // Remember to validate the commit message, commit message should not be empty, unless otherwise stated.
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
             var validatedMessage = this.Validate(context, settings);
@@ -37,7 +35,11 @@ namespace MyGit.CLI.Commands
                 AnsiConsole.MarkupLine("[red] commit message cannot be empty![/]");
                 return 1;
             }
-
+            
+            var path = ".mygit";
+            string dirPath = Path.Combine(path,)
+            this._orchestrator.timeTest();
+            this._orchestrator.OrchestrateAssembly()
             return 0;
         }
     }

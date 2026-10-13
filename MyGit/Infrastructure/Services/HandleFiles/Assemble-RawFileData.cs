@@ -1,15 +1,11 @@
 ﻿namespace MyGit.Core.Infrastructure.Services.HandleFiles
 {
     using Domain;
-    using Microsoft.VisualBasic;
     using MyGit.Core.Application.Interfaces.HandleFiles;
     using Spectre.Console;
-    using Spectre.Console.Cli;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO.Compression;
-    using System.Reflection.Metadata;
     using System.Security.Cryptography;
     using System.Text;
 
@@ -35,12 +31,23 @@
             return ordered;
         }
 
+        public string CreateObjectPath(string hashHex, string path)
+        {
+            var folder = hashHex.Substring(0, 2);
+            var file = hashHex.Substring(2);
+
+            var objPath = Path.Combine(path, folder, file);
+
+            return objPath;
+
+        }
+
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)
         {
             var memoryStream = new MemoryStream();
 
             foreach (var treeObj in treeObjs)
-            { 
+            {
                 var header = Encoding.UTF8.GetBytes($"{treeObj.mode} {treeObj.name}\0");
 
                 memoryStream.Write(header, 0, header.Length);
@@ -101,11 +108,11 @@
             return hash.ToArray();
         }
 
-        public async Task CompressBlob(byte[] blobData, string outputFilePath)
+        public async Task CompressData(byte[] data, string outputFilePath)
         {
             using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
             using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
-            await compressionStream.WriteAsync(blobData, 0, blobData.Length);
+            await compressionStream.WriteAsync(data, 0, data.Length);
         }
     }
 }

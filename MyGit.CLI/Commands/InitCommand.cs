@@ -1,7 +1,5 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace MyGit.CLI.Commands
@@ -27,7 +25,21 @@ namespace MyGit.CLI.Commands
 
             Directory.CreateDirectory(gitDir);
             Directory.CreateDirectory(Path.Combine(gitDir, "objects"));
-            Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
+
+            var refs = Directory.CreateDirectory(Path.Combine(gitDir, "refs"));
+            var head = Directory.CreateDirectory(Path.Combine(refs.FullName, "heads"));
+
+
+            if (File.Exists(Path.Combine(gitDir, "HEAD")))
+            {
+                AnsiConsole.MarkupLine($"[red]HEAD file already exists[/]");
+                return 1;
+            }
+
+            var HEADfile = File.Create(Path.Combine(gitDir, "HEAD"));
+            HEADfile.Write(Encoding.UTF8.GetBytes("ref: refs/heads/main\n"));
+
+            HEADfile.Dispose();
 
             AnsiConsole.MarkupLine($"[green]Initialized empty MyGit repository in {Markup.Escape(gitDir)}[/]");
             return 0;
