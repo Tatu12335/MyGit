@@ -29,7 +29,7 @@ namespace MyGit.Core.Application.Services
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
-            this._handleFiles.CompressBlob(blobData, outputFilePath);
+            this._handleFiles.CompressData(blobData, outputFilePath);
         }
 
         public async Task<byte[]> AssembleFileData(string filePath)

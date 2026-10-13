@@ -96,11 +96,11 @@
             return hash.ToArray();
         }
 
-        public async Task CompressBlob(byte[] blobData, string outputFilePath)
+        public async Task CompressData(byte[] data, string outputFilePath)
         {
             using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
             using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
-            await compressionStream.WriteAsync(blobData, 0, blobData.Length);
+            await compressionStream.WriteAsync(data, 0, data.Length);
         }
     }
 }

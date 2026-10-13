@@ -35,7 +35,7 @@ namespace MyGit.CLI.Commands
                 AnsiConsole.MarkupLine("[red] commit message cannot be empty![/]");
                 return 1;
             }
-
+            var path = ".mygit\\";
             this._orchestrator.timeTest();
             //this._orchestrator.OrchestrateAssembly()
             return 0;
