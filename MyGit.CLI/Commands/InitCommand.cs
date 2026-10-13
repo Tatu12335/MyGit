@@ -30,13 +30,13 @@ namespace MyGit.CLI.Commands
             var head = Directory.CreateDirectory(Path.Combine(refs.FullName, "heads"));
 
 
-            if (File.Exists(Path.Combine(refs.FullName, "HEAD")))
+            if (File.Exists(Path.Combine(gitDir, "HEAD")))
             {
                 AnsiConsole.MarkupLine($"[red]HEAD file already exists[/]");
                 return 1;
             }
 
-            var HEADfile = File.Create(Path.Combine(refs.FullName, "HEAD"));
+            var HEADfile = File.Create(Path.Combine(gitDir, "HEAD"));
             HEADfile.Write(Encoding.UTF8.GetBytes("ref: refs/heads/main\n"));
 
             HEADfile.Dispose();
