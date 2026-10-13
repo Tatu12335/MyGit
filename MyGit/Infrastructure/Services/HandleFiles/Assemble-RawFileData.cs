@@ -2,6 +2,7 @@
 {
     using Domain;
     using MyGit.Core.Application.Interfaces.HandleFiles;
+    using Spectre.Console;
     using System;
     using System.Collections.Generic;
     using System.IO.Compression;
@@ -28,6 +29,17 @@
                 .ToList();
 
             return ordered;
+        }
+
+        public string CreateObjectPath(string hashHex, string path)
+        {
+            var folder = hashHex.Substring(0, 2);
+            var file = hashHex.Substring(2);
+
+            var objPath = Path.Combine(path, folder, file);
+
+            return objPath;
+
         }
 
         public MemoryStream AssembleEntryBody(List<TreeObj> treeObjs)

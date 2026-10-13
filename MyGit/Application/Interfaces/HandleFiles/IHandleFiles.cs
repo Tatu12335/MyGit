@@ -20,6 +20,8 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public string ConvertToASCII(byte[] data);
 
+        public string CreateObjectPath(string hashHex, string path);
+
 
     }
 }
