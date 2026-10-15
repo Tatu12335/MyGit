@@ -29,8 +29,6 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 
             var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
 
-            AnsiConsole.MarkupLine($"[blue] seconds: {Markup.Escape(t.ToUnixTimeSeconds().ToString())}[/]");
-            AnsiConsole.MarkupLine($"[green]seconds: {seconds}, tz: {timezone}[/]");
             return timezone;
 
         }

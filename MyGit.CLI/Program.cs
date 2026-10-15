@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyGit.CLI.Commands;
+using MyGit.CLI.Settings;
 using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Application.Services;
 using MyGit.Core.Infrastructure.Services.HandleFiles;
@@ -24,7 +25,7 @@ class Program
         services.AddTransient<HashObjectCommand>();
         services.AddTransient<TreeCommand>();
         services.AddTransient<CommitCommand>();
-
+        services.AddTransient<BaseSettings>();
         var register = new TypeRegistrar(services);
 
         var ui = new CommandApp(register);

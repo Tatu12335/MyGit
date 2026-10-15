@@ -1,0 +1,8 @@
+﻿"profiles": {
+  "MyGit.CLI": {
+    "commandName": "Project",
+    "commandLineArgs": "commit -m \"viesti\"",
+    "workingDirectory": "C:\\Users\\tatu.lehtonen\\OneDrive - Careeria\\Työpöytä\\Tests"
+    
+  }
+}
