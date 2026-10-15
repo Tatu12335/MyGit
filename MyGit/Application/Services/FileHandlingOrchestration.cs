@@ -15,19 +15,6 @@ namespace MyGit.Core.Application.Services
             this._handleFiles = handleFiles;
         }
 
-        // This is just a temp method
-        public void WriteTreeObjToMemory(string hex, string outputPath)
-        {
-            if (File.Exists(outputPath))
-            {
-                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(outputPath)} already exists");
-                return;
-            }
-
-            Directory.CreateDirectory(outputPath);
-
-        }
-
         public void WriteFileToMemory(byte[] blobData, string outputFilePath)
         {
             if (string.IsNullOrWhiteSpace(outputFilePath))
@@ -88,8 +75,11 @@ namespace MyGit.Core.Application.Services
 
         public string GiveAndValidateObjectPath(string hashHex, string path)
         {
-            string objPath = this._handleFiles.CreateObjectPath(hashHex, path);
-            return objPath;
+            if (path == ".mygit" || path == ".git")
+                return string.Empty;
+
+            string toBeObjPath = this._handleFiles.CreateObjectPath(hashHex, path);
+            return toBeObjPath;
         }
 
         public byte[]? AssembleTree(string directoryPath, string objPath)
@@ -147,20 +137,15 @@ namespace MyGit.Core.Application.Services
             return hash;
         }
 
-        public byte[]? SortAndAssemble(List<TreeObj> objects,string path)
+        public byte[]? SortAndAssemble(List<TreeObj> objects, string path)
         {
             List<TreeObj> sorted = this._handleFiles.SortEntries(objects);
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
-            var ascii = this._handleFiles.ConvertToASCII(tree);
-            Console.WriteLine(ascii);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
-            WriteFileToMemory(tree, outputFile);
-
-
-
+            this.WriteFileToMemory(tree, outputFile);
 
             return hash;
         }
