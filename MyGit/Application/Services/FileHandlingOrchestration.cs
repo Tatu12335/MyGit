@@ -75,8 +75,11 @@ namespace MyGit.Core.Application.Services
 
         public string GiveAndValidateObjectPath(string hashHex, string path)
         {
-            if (path == ".mygit" || path == ".git")
-                return string.Empty;
+            if (!Directory.Exists(path))
+            {
+                AnsiConsole.MarkupLine($"[red]Directory[/]: {Markup.Escape(path)}, doesnt exist. Try init <path>, To run");
+                return null;
+            }
 
             string toBeObjPath = this._handleFiles.CreateObjectPath(hashHex, path);
             return toBeObjPath;
@@ -111,7 +114,6 @@ namespace MyGit.Core.Application.Services
                 treeObj.hash = Hash;
 
                 treeObjects.Add(treeObj);
-                
 
             }
 
@@ -120,8 +122,8 @@ namespace MyGit.Core.Application.Services
                 var name = Path.GetFileName(file);
                 if (name == ".mygit" || name == ".git")
                     continue;
+
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
-               
                 TreeObj treeObj = new TreeObj();
                 treeObj.name = name;
                 treeObj.hash = fileData;

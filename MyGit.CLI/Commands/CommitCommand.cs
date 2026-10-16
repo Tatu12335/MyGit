@@ -43,7 +43,10 @@ namespace MyGit.CLI.Commands
             }
 
             string objectPath = Path.Combine(settings.repo, ".mygit", "objects");
-            this._orchestrator.OrchestrateAssembly(objectPath, settings.repo, settings.message, settings.author, settings.email);
+            string commitHash = this._orchestrator.OrchestrateAssembly(objectPath, settings.repo, settings.message, settings.author, settings.email);
+
+            AnsiConsole.MarkupLine($"[green]hash :[/]{Markup.Escape(commitHash)}");
+            
             return 0;
         }
     }
