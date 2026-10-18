@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using MyGit.CLI.Commands;
 using MyGit.CLI.Settings;
+using MyGit.Core.Application.Interfaces.Commit;
 using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Application.Services;
 using MyGit.Core.Infrastructure.Services.HandleFiles;

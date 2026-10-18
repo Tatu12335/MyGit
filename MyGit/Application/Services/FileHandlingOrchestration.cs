@@ -1,7 +1,6 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
-using System.IO.Compression;
 using System.Text;
 
 namespace MyGit.Core.Application.Services

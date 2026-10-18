@@ -27,7 +27,6 @@ namespace MyGit.CLI.Commands
             this._orchestrator = orchestrator;
         }
 
-        // Remember to validate the commit message, commit message should not be empty, unless otherwise stated.
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(settings.message))
@@ -44,9 +43,11 @@ namespace MyGit.CLI.Commands
 
             string objectPath = Path.Combine(settings.repo, ".mygit", "objects");
             string commitHash = this._orchestrator.OrchestrateAssembly(objectPath, settings.repo, settings.message, settings.author, settings.email);
+            string branch = Path.Combine(settings.repo, ".mygit", "refs", "heads", "main");
 
-            AnsiConsole.MarkupLine($"[green]hash :[/]{Markup.Escape(commitHash)}");
-            
+            File.WriteAllText(branch, commitHash);
+
+            AnsiConsole.MarkupLine($"[green]hash: [/]{Markup.Escape(commitHash)}");
             return 0;
         }
     }
