@@ -1,5 +1,5 @@
-﻿using MyGit.Core.Application.Interfaces.HandleFiles;
-using Spectre.Console;
+﻿using MyGit.Core.Application.Interfaces.Commit;
+using MyGit.Core.Application.Interfaces.HandleFiles;
 
 namespace MyGit.Core.Application.Services
 {
@@ -28,8 +28,9 @@ namespace MyGit.Core.Application.Services
             var treeHex = this.GetAndAssembleTreeHash(path, toBeObjPath);
             if (File.Exists(Path.Combine(path, ".mygit\\refs\\heads\\main")))
             {
-                parentHex = File.ReadAllText(Path.Combine(path, ".mygit\\refs\\heads\\main")).Replace("\n", ""); 
+                parentHex = File.ReadAllText(Path.Combine(path, ".mygit\\refs\\heads\\main")).Replace("\n", "");
             }
+
 
             string branch = Path.Combine(path, ".mygit", "refs", "heads", "main");
 
@@ -38,7 +39,7 @@ namespace MyGit.Core.Application.Services
             var commit = this._commit.AssembleCommitHeader(commitStream);
             var hash = this._handleFiles.CalculateHash(commit);
             var hashHex = Convert.ToHexString(hash).ToLowerInvariant();
-            File.WriteAllText(branch, hashHex);
+            this._commit.Assembletz();
             return hashHex;
         }
     }

@@ -1,7 +1,4 @@
 ﻿using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MyGit.CLI.Settings
 {

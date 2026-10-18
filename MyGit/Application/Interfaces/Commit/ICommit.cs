@@ -1,6 +1,4 @@
-﻿using MyGit.Core.Domain;
-
-namespace MyGit.Core.Application.Interfaces.HandleFiles
+﻿namespace MyGit.Core.Application.Interfaces.Commit
 {
     public interface ICommit
     {
@@ -10,6 +8,6 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public string Assembletz();
 
-        public Commit AssembleCommitObj(string parentHex, string treeHex, string message, string author, string email);
+        public Domain.Commit AssembleCommitObj(string parentHex, string treeHex, string message, string author, string email);
     }
 }
