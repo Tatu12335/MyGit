@@ -1,5 +1,4 @@
-﻿using MyGit.Core.Application.Interfaces.HandleFiles;
-using Spectre.Console;
+﻿using MyGit.Core.Application.Interfaces.Commit;
 using System.Text;
 
 namespace MyGit.Core.Infrastructure.Services.NewFolder
@@ -28,9 +27,7 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
             string timezone = now.ToString("zzz").Replace(":", "");
 
             var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
-
-            AnsiConsole.MarkupLine($"[blue] seconds: {Markup.Escape(t.ToUnixTimeSeconds().ToString())}[/]");
-            AnsiConsole.MarkupLine($"[green]seconds: {seconds}, tz: {timezone}[/]");
+            Console.WriteLine(t.ToString());
             return timezone;
 
         }
@@ -54,32 +51,20 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
             return commit;
         }
 
+
+
         public MemoryStream AssembleCommitBody(Domain.Commit entry)
         {
-            var memStream = new MemoryStream();
+            var sb = new StringBuilder();
+            sb.Append($"tree {entry.treeHex}\n");
+            if (!string.IsNullOrEmpty(entry.parent))
+                sb.Append($"parent {entry.parent}\n");
+            sb.Append($"author {entry.author} <{entry.email}> {entry.seconds} {entry.tz}\n");
+            sb.Append($"committer {entry.author} <{entry.email}> {entry.seconds} {entry.tz}\n");
+            sb.Append($"\n{entry.message}\n");
 
-            memStream.Position = 0;
-            byte[] bodybytes;
-            byte[] bodybytes2;
-            // The parent commit hash should probably be string.empty at this point and not null.
+            return new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
 
-
-            if (string.IsNullOrEmpty(entry.parent))
-            {
-                bodybytes = Encoding.UTF8.GetBytes
-                     ($"tree {entry.treeHex}\nparent {entry.parent}\nauthor {entry.author} <{entry.email}>{entry.seconds} {entry.tz}\n");
-                bodybytes2 = Encoding.UTF8.GetBytes($"comitter{entry.author}<{entry.email}>{entry.seconds}\n{entry.message}\n");
-            }
-
-            bodybytes = Encoding.UTF8.GetBytes
-                    ($"tree {entry.treeHex}\nauthor {entry.author} <{entry.email}>{entry.seconds} {entry.tz}\n");
-            bodybytes2 = Encoding.UTF8.GetBytes($"comitter{entry.author}<{entry.email}>{entry.seconds}\n{entry.message}\n");
-
-            memStream.Write(bodybytes);
-            memStream.Write(bodybytes2);
-
-
-            return memStream;
         }
     }
 }

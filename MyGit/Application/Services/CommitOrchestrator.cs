@@ -1,5 +1,5 @@
-﻿using MyGit.Core.Application.Interfaces.HandleFiles;
-using Spectre.Console;
+﻿using MyGit.Core.Application.Interfaces.Commit;
+using MyGit.Core.Application.Interfaces.HandleFiles;
 
 namespace MyGit.Core.Application.Services
 {
@@ -16,36 +16,30 @@ namespace MyGit.Core.Application.Services
             this._fileHandling = fileHandling;
         }
 
-        public void timeTest()
+        public string GetAndAssembleTreeHash(string path, string toBeObjPath)
         {
-            this._commit.Assembletz();
-        }
-
-        public string GetAndAssembleTreeHash(string path, string outputfilePath)
-        {
-            var tree = this._fileHandling.AssembleTree(path, outputfilePath);
+            var tree = this._fileHandling.AssembleTree(path, toBeObjPath);
             return Convert.ToHexString(tree).ToLowerInvariant();
         }
 
-        public string OrchestrateAssembly(string outputfile, string path, string message, string author, string email)
+        public string OrchestrateAssembly(string toBeObjPath, string path, string message, string author, string email)
         {
             string parentHex = string.Empty;
-            var treeHex = this.GetAndAssembleTreeHash(path, outputfile);
-            if (File.Exists(".mygit\\refs\\heads\\main"))
+            var treeHex = this.GetAndAssembleTreeHash(path, toBeObjPath);
+            if (File.Exists(Path.Combine(path, ".mygit\\refs\\heads\\main")))
             {
-                parentHex = File.ReadAllText(".mygit\\refs\\heads\\main").Replace("\n", ""); 
+                parentHex = File.ReadAllText(Path.Combine(path, ".mygit\\refs\\heads\\main")).Replace("\n", "");
             }
 
-            string branch = Path.Combine(".mygit", "refs", "heads", "main");
 
-            File.Create(branch);
+            string branch = Path.Combine(path, ".mygit", "refs", "heads", "main");
 
             var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
             var commitStream = this._commit.AssembleCommitBody(obj);
             var commit = this._commit.AssembleCommitHeader(commitStream);
             var hash = this._handleFiles.CalculateHash(commit);
             var hashHex = Convert.ToHexString(hash).ToLowerInvariant();
-            File.WriteAllText(branch,hashHex);
+            this._commit.Assembletz();
             return hashHex;
         }
     }

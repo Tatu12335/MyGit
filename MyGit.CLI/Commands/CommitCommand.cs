@@ -1,4 +1,5 @@
-﻿using MyGit.Core.Application.Services;
+﻿using MyGit.CLI.Settings;
+using MyGit.Core.Application.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -6,7 +7,7 @@ namespace MyGit.CLI.Commands
 {
     public class CommitCommand : AsyncCommand<CommitCommand.Settings>
     {
-        public class Settings : CommandSettings
+        public class Settings : BaseSettings
         {
             [CommandOption("-m|--message <message>")]
             public required string message { get; set; }
@@ -16,6 +17,7 @@ namespace MyGit.CLI.Commands
 
             [CommandOption("--email <email>")]
             public required string email { get; set; }
+
         }
 
         private readonly CommitOrchestrator _orchestrator;
@@ -25,21 +27,27 @@ namespace MyGit.CLI.Commands
             this._orchestrator = orchestrator;
         }
 
-        // Remember to validate the commit message, commit message should not be empty, unless otherwise stated.
         protected override async Task<int> ExecuteAsync(CommandContext context, Settings settings, CancellationToken cancellationToken)
         {
-            var validatedMessage = this.Validate(context, settings);
-
-            if (!validatedMessage.Successful)
+            if (string.IsNullOrEmpty(settings.message))
             {
                 AnsiConsole.MarkupLine("[red] commit message cannot be empty![/]");
                 return 1;
             }
-            
-            var path = ".mygit";
-            string dirPath = Path.Combine(path,)
-            this._orchestrator.timeTest();
-            this._orchestrator.OrchestrateAssembly()
+
+            if (string.IsNullOrEmpty(settings.repo))
+            {
+                AnsiConsole.MarkupLine($"[red]Run init <path> to initialize, then commit -m <message> --repo <path>[/]");
+                return 1;
+            }
+
+            string objectPath = Path.Combine(settings.repo, ".mygit", "objects");
+            string commitHash = this._orchestrator.OrchestrateAssembly(objectPath, settings.repo, settings.message, settings.author, settings.email);
+            string branch = Path.Combine(settings.repo, ".mygit", "refs", "heads", "main");
+
+            File.WriteAllText(branch, commitHash);
+
+            AnsiConsole.MarkupLine($"[green]hash: [/]{Markup.Escape(commitHash)}");
             return 0;
         }
     }

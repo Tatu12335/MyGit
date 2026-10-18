@@ -1,7 +1,6 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
-using System.IO.Compression;
 using System.Text;
 
 namespace MyGit.Core.Application.Services
@@ -13,19 +12,6 @@ namespace MyGit.Core.Application.Services
         public FileHandlingOrchestration(IHandleFiles handleFiles)
         {
             this._handleFiles = handleFiles;
-        }
-
-        // This is just a temp method
-        public void WriteTreeObjToMemory(string hex, string outputPath)
-        {
-            if (File.Exists(outputPath))
-            {
-                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(outputPath)} already exists");
-                return;
-            }
-
-            Directory.CreateDirectory(outputPath);
-
         }
 
         public void WriteFileToMemory(byte[] blobData, string outputFilePath)
@@ -88,8 +74,14 @@ namespace MyGit.Core.Application.Services
 
         public string GiveAndValidateObjectPath(string hashHex, string path)
         {
-            string objPath = this._handleFiles.CreateObjectPath(hashHex, path);
-            return objPath;
+            if (!Directory.Exists(path))
+            {
+                AnsiConsole.MarkupLine($"[red]Directory[/]: {Markup.Escape(path)}, doesnt exist. Try init <path>, To run");
+                return null;
+            }
+
+            string toBeObjPath = this._handleFiles.CreateObjectPath(hashHex, path);
+            return toBeObjPath;
         }
 
         public byte[]? AssembleTree(string directoryPath, string objPath)
@@ -121,7 +113,6 @@ namespace MyGit.Core.Application.Services
                 treeObj.hash = Hash;
 
                 treeObjects.Add(treeObj);
-                
 
             }
 
@@ -130,8 +121,8 @@ namespace MyGit.Core.Application.Services
                 var name = Path.GetFileName(file);
                 if (name == ".mygit" || name == ".git")
                     continue;
+
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
-               
                 TreeObj treeObj = new TreeObj();
                 treeObj.name = name;
                 treeObj.hash = fileData;
@@ -147,20 +138,15 @@ namespace MyGit.Core.Application.Services
             return hash;
         }
 
-        public byte[]? SortAndAssemble(List<TreeObj> objects,string path)
+        public byte[]? SortAndAssemble(List<TreeObj> objects, string path)
         {
             List<TreeObj> sorted = this._handleFiles.SortEntries(objects);
             MemoryStream body = this._handleFiles.AssembleEntryBody(sorted);
             byte[] tree = this._handleFiles.AssembleTree(body);
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
-            var ascii = this._handleFiles.ConvertToASCII(tree);
-            Console.WriteLine(ascii);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
-            WriteFileToMemory(tree, outputFile);
-
-
-
+            this.WriteFileToMemory(tree, outputFile);
 
             return hash;
         }

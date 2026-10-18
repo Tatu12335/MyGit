@@ -2,7 +2,6 @@
 {
     using Domain;
     using MyGit.Core.Application.Interfaces.HandleFiles;
-    using Spectre.Console;
     using System;
     using System.Collections.Generic;
     using System.IO.Compression;
