@@ -9,7 +9,7 @@ namespace MyGit.CLI.Commands
         public class Settings : CommandSettings
         {
             [CommandArgument(0, "<path>")]
-            public string path { get; set; } = string.Empty;
+            public string path { get; set; }
         }
 
         protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)

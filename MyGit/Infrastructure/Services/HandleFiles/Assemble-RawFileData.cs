@@ -21,7 +21,6 @@
             return await File.ReadAllBytesAsync(filePath);
         }
 
-        // this seems to be the problem as of now, fix it later!
         public List<TreeObj> SortEntries(List<TreeObj> treeObjs)
         {
             var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name, StringComparer.Ordinal)

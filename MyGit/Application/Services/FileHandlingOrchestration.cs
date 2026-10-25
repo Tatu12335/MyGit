@@ -24,7 +24,7 @@ namespace MyGit.Core.Application.Services
 
             if (File.Exists(outputFilePath))
             {
-                AnsiConsole.MarkupLine($"[red]error:[/] File {Markup.Escape(outputFilePath)} already exists");
+                AnsiConsole.MarkupLine($"[yellow]warning:[/] Output file path '{outputFilePath}' already exist");
                 return;
             }
 
@@ -94,6 +94,7 @@ namespace MyGit.Core.Application.Services
                 return null;
             }
 
+            // Goes through directories unless the name is .mygit or .git, and adds the treeobj to the list.
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
                 var name = Path.GetFileName(dir);
@@ -116,6 +117,7 @@ namespace MyGit.Core.Application.Services
 
             }
 
+            // Goes through files and adds them to the treeobjects list.
             foreach (var file in Directory.GetFiles(directoryPath))
             {
                 var name = Path.GetFileName(file);
@@ -123,6 +125,7 @@ namespace MyGit.Core.Application.Services
                     continue;
 
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
+                
                 TreeObj treeObj = new TreeObj();
                 treeObj.name = name;
                 treeObj.hash = fileData;
@@ -133,6 +136,7 @@ namespace MyGit.Core.Application.Services
 
             if (treeObjects.Count == 0)
                 return null;
+
             var hash = this.SortAndAssemble(treeObjects, objPath);
 
             return hash;
