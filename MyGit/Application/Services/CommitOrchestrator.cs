@@ -31,14 +31,13 @@ namespace MyGit.Core.Application.Services
                 parentHex = File.ReadAllText(Path.Combine(path, ".mygit\\refs\\heads\\main")).Replace("\n", "");
             }
 
-
-            string branch = Path.Combine(path, ".mygit", "refs", "heads", "main");
-
             var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
             var commitStream = this._commit.AssembleCommitBody(obj);
-            var commit = this._commit.AssembleCommitHeader(commitStream);
+            var commit = this._commit.AssembleCommit(commitStream);
             var hash = this._handleFiles.CalculateHash(commit);
             var hashHex = Convert.ToHexString(hash).ToLowerInvariant();
+            var objPath = this._fileHandling.GiveAndValidateObjectPath(hashHex, path);
+            this._fileHandling.WriteFileToMemory(hash, objPath);
             this._commit.Assembletz();
             return hashHex;
         }
