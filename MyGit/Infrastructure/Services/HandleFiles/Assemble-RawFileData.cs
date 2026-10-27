@@ -21,7 +21,6 @@
             return await File.ReadAllBytesAsync(filePath);
         }
 
-        // this seems to be the problem as of now, fix it later!
         public List<TreeObj> SortEntries(List<TreeObj> treeObjs)
         {
             var ordered = treeObjs.OrderBy(obj => obj.mode == "40000" ? obj.name + "/" : obj.name, StringComparer.Ordinal)
@@ -107,11 +106,11 @@
             return hash.ToArray();
         }
 
-        public async Task CompressData(byte[] data, string outputFilePath)
+        public void CompressData(byte[] data, string outputFilePath)
         {
             using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
             using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
-            await compressionStream.WriteAsync(data, 0, data.Length);
+            compressionStream.Write(data, 0, data.Length);
         }
     }
 }

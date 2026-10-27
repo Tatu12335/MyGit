@@ -5,7 +5,7 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 {
     public class Commit : ICommit
     {
-        public byte[] AssembleCommitHeader(MemoryStream body)
+        public byte[] AssembleCommit(MemoryStream body)
         {
             var stream = new MemoryStream();
             var header = Encoding.UTF8.GetBytes($"commit {body.Length}\0");
@@ -26,9 +26,9 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 
             string timezone = now.ToString("zzz").Replace(":", "");
 
-            var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
-            Console.WriteLine(t.ToString());
-            return timezone;
+            //var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
+            //Console.WriteLine(t.ToString());
+            return timezone.ToString();
 
         }
 
@@ -57,8 +57,10 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
         {
             var sb = new StringBuilder();
             sb.Append($"tree {entry.treeHex}\n");
+
             if (!string.IsNullOrEmpty(entry.parent))
                 sb.Append($"parent {entry.parent}\n");
+
             sb.Append($"author {entry.author} <{entry.email}> {entry.seconds} {entry.tz}\n");
             sb.Append($"committer {entry.author} <{entry.email}> {entry.seconds} {entry.tz}\n");
             sb.Append($"\n{entry.message}\n");

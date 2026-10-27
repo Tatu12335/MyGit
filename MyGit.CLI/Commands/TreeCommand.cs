@@ -30,6 +30,7 @@ namespace MyGit.CLI.Commands
                 AnsiConsole.MarkupLine($"[red]run \"init <path>\" to run![/]");
                 return 1;
             }
+
             string objPath = Path.Combine(gitDir, "objects");
 
             var hash = this._fileHandlingOrchestration.AssembleTree(settings.path, objPath);

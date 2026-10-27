@@ -1,5 +1,7 @@
 ﻿using MyGit.Core.Application.Interfaces.Commit;
 using MyGit.Core.Application.Interfaces.HandleFiles;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MyGit.Core.Application.Services
 {
@@ -31,15 +33,15 @@ namespace MyGit.Core.Application.Services
                 parentHex = File.ReadAllText(Path.Combine(path, ".mygit\\refs\\heads\\main")).Replace("\n", "");
             }
 
-
-            string branch = Path.Combine(path, ".mygit", "refs", "heads", "main");
-
             var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
             var commitStream = this._commit.AssembleCommitBody(obj);
-            var commit = this._commit.AssembleCommitHeader(commitStream);
+            var commit = this._commit.AssembleCommit(commitStream);
+            Console.WriteLine(commit.Length);
+            Console.WriteLine(Encoding.UTF8.GetString(commit).Replace("\0", "<NUL>"));
             var hash = this._handleFiles.CalculateHash(commit);
             var hashHex = Convert.ToHexString(hash).ToLowerInvariant();
-            this._commit.Assembletz();
+            var objPath = this._fileHandling.GiveAndValidateObjectPath(hashHex, toBeObjPath);
+            this._fileHandling.WriteFileToMemory(commit, objPath);
             return hashHex;
         }
     }

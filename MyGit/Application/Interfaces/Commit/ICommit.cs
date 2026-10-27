@@ -2,7 +2,7 @@
 {
     public interface ICommit
     {
-        public byte[] AssembleCommitHeader(MemoryStream body);
+        public byte[] AssembleCommit(MemoryStream body);
 
         public MemoryStream AssembleCommitBody(Domain.Commit entry);
 
