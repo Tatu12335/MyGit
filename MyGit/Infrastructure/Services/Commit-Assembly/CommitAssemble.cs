@@ -26,9 +26,9 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 
             string timezone = now.ToString("zzz").Replace(":", "");
 
-            var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
-            Console.WriteLine(t.ToString());
-            return t.ToString();
+            //var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
+            //Console.WriteLine(t.ToString());
+            return timezone.ToString();
 
         }
 

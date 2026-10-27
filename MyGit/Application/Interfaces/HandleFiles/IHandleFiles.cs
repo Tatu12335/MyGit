@@ -10,7 +10,7 @@ namespace MyGit.Core.Application.Interfaces.HandleFiles
 
         public byte[] CalculateHash(byte[] data);
 
-        public Task CompressData(byte[] data, string outputFilePath);
+        public void CompressData(byte[] data, string outputFilePath);
 
         public byte[] AssembleTree(MemoryStream body);
 

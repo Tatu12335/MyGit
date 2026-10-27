@@ -32,44 +32,16 @@ namespace MyGit.Core.Application.Services
             this._handleFiles.CompressData(blobData, outputFilePath);
         }
 
+        public byte[] CalculateHash(byte[] data)
+        {
+            return this._handleFiles.CalculateHash(data);
+        }
+
         public async Task<byte[]> AssembleFileData(string filePath)
         {
             byte[] content = await this._handleFiles.ReadFile(filePath);
             byte[] blob = this._handleFiles.AssembleBlob(content);
-            byte[] hash = this._handleFiles.CalculateHash(blob);
-
-            return hash;
-        }
-
-        public void BuildTreeString(string directoryPath)
-        {
-            if (!Directory.Exists(directoryPath))
-            {
-                AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
-                return;
-            }
-
-            if (directoryPath.Contains(".mygit")
-                || directoryPath.Contains(".mygit/")
-                || directoryPath.Contains("MyGit.CLI")
-                || directoryPath.Contains(".git"))
-            {
-                return;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var dir in Directory.GetDirectories(directoryPath))
-            {
-                sb.AppendLine($"dir: {dir}");
-                this.BuildTreeString(dir);
-            }
-
-            foreach (var file in Directory.GetFiles(directoryPath))
-            {
-                sb.AppendLine($"file: {file}");
-            }
-
-            AnsiConsole.MarkupLine(sb.ToString());
+            return blob;
         }
 
         public string GiveAndValidateObjectPath(string hashHex, string path)
@@ -150,7 +122,9 @@ namespace MyGit.Core.Application.Services
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
+            Console.WriteLine(outputFile);
             this.WriteFileToMemory(tree, outputFile);
+
 
             return hash;
         }
