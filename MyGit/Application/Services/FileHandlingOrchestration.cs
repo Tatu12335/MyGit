@@ -48,7 +48,6 @@ namespace MyGit.Core.Application.Services
                 AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
                 return;
             }
-
             if (directoryPath.Contains(".mygit")
                 || directoryPath.Contains(".mygit/")
                 || directoryPath.Contains("MyGit.CLI")
@@ -93,7 +92,7 @@ namespace MyGit.Core.Application.Services
                 AnsiConsole.MarkupLine($"[red]error:[/] Directory {Markup.Escape(directoryPath)} not found");
                 return null;
             }
-
+            
             // Goes through directories unless the name is .mygit or .git, and adds the treeobj to the list.
             foreach (var dir in Directory.GetDirectories(directoryPath))
             {
@@ -150,7 +149,9 @@ namespace MyGit.Core.Application.Services
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
+            Console.WriteLine(outputFile);
             this.WriteFileToMemory(tree, outputFile);
+
 
             return hash;
         }
