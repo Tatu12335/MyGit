@@ -1,6 +1,7 @@
 ﻿using MyGit.Core.Application.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.Reflection.Metadata;
 
 namespace MyGit.CLI.Commands
 {
@@ -30,18 +31,20 @@ namespace MyGit.CLI.Commands
                 return 1;
             }
 
-            var hash = await this._fileHandlingOrchestration.AssembleFileData(settings.FilePath);
+            var blob = await this._fileHandlingOrchestration.AssembleFileData(settings.FilePath);
+            var hash = this._fileHandlingOrchestration.CalculateHash(blob);
             string hashHex = Convert.ToHexString(hash).ToLowerInvariant();
             string folder = hashHex.Substring(0, 2);
             string fileName = hashHex.Substring(2);
 
+            var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".mygit");
+            var objectPath = Path.Combine(gitDir, "objects", folder, fileName);
             if (settings.Write)
             {
-                var gitDir = Path.Combine(Directory.GetCurrentDirectory(), ".mygit");
-                var objectPath = Path.Combine(gitDir, "objects", folder, fileName);
+
                 if (!File.Exists(objectPath))
                 {
-                    this._fileHandlingOrchestration.WriteFileToMemory(hash, objectPath);
+                    this._fileHandlingOrchestration.WriteFileToMemory(blob, objectPath);
                     AnsiConsole.MarkupLine($"[green]Wrote object to {Markup.Escape(objectPath)}[/]");
                 }
                 else

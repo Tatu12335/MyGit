@@ -108,7 +108,6 @@
 
         public void CompressData(byte[] data, string outputFilePath)
         {
-            Console.WriteLine($"WRITE {outputFilePath} len={data.Length}");
             using var outputFileStream = new FileStream(outputFilePath, FileMode.Create);
             using var compressionStream = new ZLibStream(outputFileStream, CompressionLevel.Optimal);
             compressionStream.Write(data, 0, data.Length);
