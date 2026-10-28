@@ -1,6 +1,7 @@
 ﻿using MyGit.Core.Application.Interfaces.HandleFiles;
 using MyGit.Core.Domain;
 using Spectre.Console;
+using System.IO.Compression;
 using System.Text;
 
 namespace MyGit.Core.Application.Services
@@ -12,6 +13,20 @@ namespace MyGit.Core.Application.Services
         public FileHandlingOrchestration(IHandleFiles handleFiles)
         {
             this._handleFiles = handleFiles;
+        }
+
+        // Helper method to debug the decompressed blob and tree data.
+        static void DumpObject(string path)
+        {
+            using var fs = File.OpenRead(path);
+            using var z = new ZLibStream(fs, CompressionMode.Decompress);
+            using var ms = new MemoryStream();
+            z.CopyTo(ms);
+            var bytes = ms.ToArray();
+
+            Console.WriteLine($"len={bytes.Length}");
+            Console.WriteLine(Convert.ToHexString(bytes));
+            Console.WriteLine(Encoding.UTF8.GetString(bytes).Replace("\0", "<NUL>"));
         }
 
         public void WriteFileToMemory(byte[] blobData, string outputFilePath)
@@ -97,10 +112,11 @@ namespace MyGit.Core.Application.Services
                     continue;
 
                 var fileData = this.AssembleFileData(file).GetAwaiter().GetResult();
-                
+                var filehash = this.CalculateHash(fileData);
+
                 TreeObj treeObj = new TreeObj();
                 treeObj.name = name;
-                treeObj.hash = fileData;
+                treeObj.hash = filehash;
                 treeObj.mode = "100644";
 
                 treeObjects.Add(treeObj);
@@ -122,10 +138,7 @@ namespace MyGit.Core.Application.Services
             byte[] hash = this._handleFiles.CalculateHash(tree);
             var hashHex = Convert.ToHexString(hash);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
-            Console.WriteLine(outputFile);
             this.WriteFileToMemory(tree, outputFile);
-
-
             return hash;
         }
     }
