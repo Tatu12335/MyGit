@@ -1,5 +1,6 @@
 ﻿using MyGit.Core.Application.Interfaces.Commit;
 using MyGit.Core.Application.Interfaces.HandleFiles;
+using System.IO.Compression;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
