@@ -139,6 +139,7 @@ namespace MyGit.Core.Application.Services
             var hashHex = Convert.ToHexString(hash);
             var outputFile = this.GiveAndValidateObjectPath(hashHex, path);
             this.WriteFileToMemory(tree, outputFile);
+            DumpObject(outputFile);
             return hash;
         }
     }
