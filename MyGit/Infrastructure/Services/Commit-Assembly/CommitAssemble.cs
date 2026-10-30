@@ -19,16 +19,16 @@ namespace MyGit.Core.Infrastructure.Services.NewFolder
 
         }
 
+        // Assemble timezone
         public string Assembletz()
         {
             var now = DateTimeOffset.Now;
             long seconds = now.ToUnixTimeSeconds();
-
+            
+            // Uses the unixseconds and puts it in a utc hour + minute format, replaces : with an "".  
             string timezone = now.ToString("zzz").Replace(":", "");
-
-            //var t = DateTimeOffset.FromUnixTimeSeconds(1700000000).ToOffset(TimeSpan.FromHours(2));
-            //Console.WriteLine(t.ToString());
-            return timezone.ToString();
+           
+            return timezone;
 
         }
 
