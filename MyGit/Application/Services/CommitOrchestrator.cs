@@ -37,8 +37,6 @@ namespace MyGit.Core.Application.Services
             var obj = this._commit.AssembleCommitObj(parentHex, treeHex, message, author, email);
             var commitStream = this._commit.AssembleCommitBody(obj);
             var commit = this._commit.AssembleCommit(commitStream);
-            Console.WriteLine(commit.Length);
-            Console.WriteLine(Encoding.UTF8.GetString(commit).Replace("\0", "<NUL>"));
             var hash = this._handleFiles.CalculateHash(commit);
             var hashHex = Convert.ToHexString(hash).ToLowerInvariant();
             var objPath = this._fileHandling.GiveAndValidateObjectPath(hashHex, toBeObjPath);
